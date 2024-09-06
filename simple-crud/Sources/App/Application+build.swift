@@ -1,9 +1,10 @@
 import Hummingbird
 import Logging
+import OracleNIO
 
 /// Application arguments protocol. We use a protocol so we can call
-/// `buildApplication` inside Tests as well as in the App executable. 
-/// Any variables added here also have to be added to `App` in App.swift and 
+/// `buildApplication` inside Tests as well as in the App executable.
+/// Any variables added here also have to be added to `App` in App.swift and
 /// `TestArguments` in AppTest.swift
 public protocol AppArguments {
     var hostname: String { get }
@@ -14,30 +15,71 @@ public protocol AppArguments {
 public func buildApplication(_ arguments: some AppArguments) async throws -> some ApplicationProtocol {
     let environment = Environment()
     let logger = {
-        var logger = Logger(label: "simple_crud")
-        logger.logLevel = 
-            arguments.logLevel ??
-            environment.get("LOG_LEVEL").map { Logger.Level(rawValue: $0) ?? .info } ??
+        var logger = Logger(label: "Spatial")
+        logger.logLevel =
+        arguments.logLevel ??
+        environment.get("LOG_LEVEL").map { Logger.Level(rawValue: $0) ?? .info } ??
             .info
         return logger
     }()
-    let router = Router()
     
-    // Add logging
+    let router = Router()
+    /// Add logging
     router.add(middleware: LogRequestsMiddleware(.info))
     
-    // Add health endpoint
+    /// Add health endpoint
+    /// Checks server health status
     router.get("/health") { _,_ -> HTTPResponse.Status in
         return .ok
     }
     
-    let app = Application(
+    /// Database configuration
+    /// Use `docker exec -it ora23ai ./setPassword.sh Welcome1` to change thedefault random password
+    let config = OracleConnection.Configuration(
+        host: "127.0.0.1",
+        port: 1522,
+        service: .sid("FREE"),
+        username: "SYSTEM",
+        password: "Welcome1"
+    )
+    
+    let connection = try await OracleConnection.connect(
+        configuration: config,
+        id: 1,
+        logger: logger
+    )
+    
+    /// Create the table in the database using the new `IF NOT EXISTS` keyword
+    try await connection.execute(
+    """
+        CREATE TABLE IF NOT EXISTS parks (
+          id RAW (32) DEFAULT SYS_GUID () PRIMARY KEY,
+          name VARCHAR2 (100),
+          latitude FLOAT,
+          longitude FLOAT
+    )
+    """,
+    logger: logger
+    )
+    
+    let client = OracleClient(configuration: config, backgroundLogger: logger)
+    
+    /// Controller
+    ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
+    
+    var app = Application(
         router: router,
         configuration: .init(
             address: .hostname(arguments.hostname, port: arguments.port),
-            serverName: "simple_crud"
+            serverName: "simple-crud"
         ),
         logger: logger
     )
+    
+    app.addServices(client)
+    
+    /// Close your connection once done
+    try await connection.close()
+    
     return app
 }
