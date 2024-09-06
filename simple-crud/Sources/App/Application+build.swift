@@ -53,7 +53,7 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     try await connection.execute(
     """
         CREATE TABLE IF NOT EXISTS parks (
-          id RAW (32) DEFAULT SYS_GUID () PRIMARY KEY,
+          id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
           name VARCHAR2 (100),
           latitude FLOAT,
           longitude FLOAT

@@ -73,6 +73,7 @@ struct ParksController<Context: RequestContext> {
     /// Returns a single park with id
     @Sendable func show(_ request: Request, context: Context) async throws -> Park? {
         let id = try context.parameters.require("id", as: String.self)
+        let guid = id.replacingOccurrences(of: "-", with: "")
         
         return try await client.withConnection { conn in
             let rows = try await conn.execute(
@@ -84,7 +85,7 @@ struct ParksController<Context: RequestContext> {
                         longitude
                     FROM
                         parks
-                    WHERE id = HEXTORAW(\(id))
+                    WHERE id = HEXTORAW(\(guid))
                     """,
                     logger: logger
             )
@@ -104,6 +105,7 @@ struct ParksController<Context: RequestContext> {
     /// Edits park with id
     @Sendable func update(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
         let id = try context.parameters.require("id", as: String.self)
+        let guid = id.replacingOccurrences(of: "-", with: "")
         let park = try await request.decode(as: Park.self, context: context)
         
         return try await client.withConnection { conn in
@@ -113,7 +115,7 @@ struct ParksController<Context: RequestContext> {
                     SET name = \(park.name),
                         latitude = \(park.latitude),
                         longitude = \(park.longitude)
-                    WHERE id = HEXTORAW(\(id))
+                    WHERE id = HEXTORAW(\(guid))
                     """,
                     logger: logger
             )
@@ -125,12 +127,13 @@ struct ParksController<Context: RequestContext> {
     /// Deletes park with id
     @Sendable func delete(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
         let id = try context.parameters.require("id", as: String.self)
+        let guid = id.replacingOccurrences(of: "-", with: "")
       
         return try await client.withConnection { conn in
             try await conn.execute(
                     """
                     DELETE FROM parks
-                    WHERE id = HEXTORAW(\(id))
+                    WHERE id = HEXTORAW(\(guid))
                     """,
                     logger: logger
             )
