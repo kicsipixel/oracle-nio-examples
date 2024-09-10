@@ -8,4 +8,4 @@ struct Park {
     let longitude: Float
 }
 
-extension Park: ResponseCodable, Equatable { }
+extension Park: ResponseCodable, Equatable {}
