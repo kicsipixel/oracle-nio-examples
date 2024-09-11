@@ -62,7 +62,6 @@ struct ParksController<Context: RequestContext> {
                 parks.append(park)
             }
         }
-
         return parks
     }
 
