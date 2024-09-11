@@ -1,10 +1,9 @@
 .DS_Store
-**/.build
-**/.swiftpm/xcode
+/.build
+/.swiftpm
 /.devContainer
 /Packages
 /*.xcodeproj
 xcuserdata/
-**/.vscode/*
+/.vscode/*
 !/.vscode/hummingbird.code-snippets
-**/.env
