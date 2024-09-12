@@ -68,7 +68,7 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     
     /// Controller
     ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
-    WebsitesController(mustacheLibrary: library).addRoutes(to: router)
+    WebsitesController(mustacheLibrary: library, client: client, logger: logger).addRoutes(to: router)
     
     var app = Application(
         router: router,

@@ -6,7 +6,10 @@ function initializeMap(annotationData) {
     }
     });
     
-    var map = new mapkit.Map("map");
+    // Start in Satellite mode for better visibility
+    var map = new mapkit.Map("map", {
+                mapType: mapkit.Map.MapTypes.Satellite
+            });
     
     // Set the initial region of the map
     map.region = new mapkit.CoordinateRegion(
@@ -14,18 +17,7 @@ function initializeMap(annotationData) {
                                              new mapkit.CoordinateSpan(0.1, 0.1)
                                              );
     
-    // Create an annotation
-    var annotation = new mapkit.MarkerAnnotation(
-                                                 new mapkit.Coordinate(50.08639, 14.41194),
-                                                 {
-                                                 title: "You are here",
-                                                 subtitle: "You are standing the oldest bridge in Central Europe.",
-                                                 color: "#FF392E",
-                                                 }
-                                                 );
-    
-    map.addAnnotation(annotation);
-    
+    // Create parks
     annotationData.forEach(function(data) {
         var parkAnnotation = new mapkit.MarkerAnnotation(
                                                          new mapkit.Coordinate(data.latitude, data.longitude),
@@ -41,4 +33,16 @@ function initializeMap(annotationData) {
         // Add the annotation to the map
         map.addAnnotation(parkAnnotation);
     });
+    
+    // Create "You are here"
+    var annotation = new mapkit.MarkerAnnotation(
+                                                 new mapkit.Coordinate(50.08639, 14.41194),
+                                                 {
+                                                 title: "You are here",
+                                                 subtitle: "You are standing the oldest bridge in Central Europe.",
+                                                 color: "#FF392E",
+                                                 }
+                                                 );
+    
+    map.addAnnotation(annotation);
 }
