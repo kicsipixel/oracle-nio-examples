@@ -4,4 +4,5 @@ Read the [following instructions how to run](https://medium.com/oracledevs/run-o
 
 Examples to demonstrate [Hummingbird 2.0](https://hummingbird.codes) with [oracle-nio](https://github.com/lovetodream/oracle-nio/tree/main).
 
-- [simple-crud](https://github.com/kicsipixel/oracle-nio-examples/tree/main/simple-crud) - Simple application to demonstrate CRUD operations  
+- [simple-crud](https://github.com/kicsipixel/oracle-nio-examples/tree/main/simple-crud) - Simple application to demonstrate CRUD operations
+- [spatial](https://github.com/kicsipixel/oracle-nio-examples/tree/main/spatial) - Example to use SDO_GEOMETRY for location analysis
