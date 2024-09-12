@@ -23,17 +23,17 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     let logger = {
         var logger = Logger(label: "spatial")
         logger.logLevel =
-        arguments.logLevel ??
-        environment.get("LOG_LEVEL").map { Logger.Level(rawValue: $0) ?? .info } ??
+            arguments.logLevel ??
+            environment.get("LOG_LEVEL").map { Logger.Level(rawValue: $0) ?? .info } ??
             .info
         return logger
     }()
-    
+
     let router = buildRouter()
     // Template library - Mustache
-     let library = try await MustacheLibrary(directory: "Resources/Templates")
-     assert(library.getTemplate(named: "base") != nil)
-    
+    let library = try await MustacheLibrary(directory: "Resources/Templates")
+    assert(library.getTemplate(named: "base") != nil)
+
     /// Database configuration
     /// Use `docker exec -it ora23ai ./setPassword.sh Welcome1` to change thedefault random password
     let config = OracleConnection.Configuration(
@@ -42,12 +42,12 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
         service: .sid("FREE"),
         username: "SYSTEM",
         password: "Welcome1")
-    
+
     let connection = try await OracleConnection.connect(
         configuration: config,
         id: 1,
         logger: logger)
-    
+
     /// Create the table in the database using the new `IF NOT EXISTS` keyword
     try await connection.execute(
         """
@@ -59,47 +59,47 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
         )
         """,
         logger: logger)
-    
+
     /// Close your connection once done
     try await connection.close()
-    
+
     /// Create the client
     let client = OracleClient(configuration: config, backgroundLogger: logger)
-    
+
     /// Controller
     ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
     WebsitesController(mustacheLibrary: library, client: client, logger: logger).addRoutes(to: router)
-    
+
     var app = Application(
         router: router,
         configuration: .init(
             address: .hostname(arguments.hostname, port: arguments.port),
             serverName: "spatial"),
         logger: logger)
-    
+
     if arguments.seed {
         try await app.seedDatabase(app, config: config)
     }
-    
+
     app.addServices(client)
-    
+
     return app
 }
 
 func buildRouter() -> Router<AppRequestContext> {
     let router = Router(context: AppRequestContext.self)
-    
+
     // Add middleware
     router.addMiddleware {
         // logging middleware
         LogRequestsMiddleware(.info)
         FileMiddleware()
     }
-    
+
     // Add health endpoint
-    router.get("/health") { _,_ -> HTTPResponse.Status in
-        return .ok
+    router.get("/health") { _, _ -> HTTPResponse.Status in
+        .ok
     }
-    
+
     return router
 }

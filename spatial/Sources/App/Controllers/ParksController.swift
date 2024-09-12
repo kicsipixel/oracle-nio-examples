@@ -14,7 +14,7 @@ struct ParksController<Context: RequestContext> {
     }
 
     // MARK: - index
-    
+
     /// list all parks in the database
     /// Usage: 'curl http://localhost:8080/api/v1/parks/'
     @Sendable
@@ -49,7 +49,7 @@ struct ParksController<Context: RequestContext> {
     }
 
     // MARK: - filter
-    
+
     /// Search all parks withint the given distance
     /// Usage: 'curl http://localhost:8080/api/v1/parks/distance?mile=1'
     @Sendable
@@ -100,7 +100,8 @@ struct ParksController<Context: RequestContext> {
                 let park = Park(id: id,
                                 name: name,
                                 address: address,
-                                latitude: latitude, longitude: longitude)
+                                latitude: latitude,
+                                longitude: longitude)
                 parks.append(park)
             }
         }
