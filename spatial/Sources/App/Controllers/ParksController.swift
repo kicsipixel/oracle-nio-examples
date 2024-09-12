@@ -13,9 +13,10 @@ struct ParksController<Context: RequestContext> {
             .get("/distance", use: filter)
     }
 
-    // MARK: - index: list all parks
-    /// Usage: 'http://localhost:8080/api/v1/parks/'
-    /// HTTPMethod: `GET`
+    // MARK: - index
+    
+    /// list all parks in the database
+    /// Usage: 'curl http://localhost:8080/api/v1/parks/'
     @Sendable
     func index(_: Request, context _: Context) async throws -> [Park] {
         var parks = [Park]()
@@ -47,9 +48,10 @@ struct ParksController<Context: RequestContext> {
         return parks
     }
 
-    // MARK: - filter: search all parks withint the given distance
-    /// Usage: 'http://localhost:8080/api/v1/parks/distance?mile=1'
-    /// HTTPMethod: `GET`
+    // MARK: - filter
+    
+    /// Search all parks withint the given distance
+    /// Usage: 'curl http://localhost:8080/api/v1/parks/distance?mile=1'
     @Sendable
     func filter(_ request: Request, context _: Context) async throws -> [Park] {
         var parks = [Park]()

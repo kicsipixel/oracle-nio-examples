@@ -10,9 +10,9 @@ let package = Package(
         .executable(name: "App", targets: ["App"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0-rc.5"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0"),
-        // Oracle-NIO
+        // OracleNIO
         .package(url: "https://github.com/lovetodream/oracle-nio.git", from: "1.0.0-beta.1"),
     ],
     targets: [
