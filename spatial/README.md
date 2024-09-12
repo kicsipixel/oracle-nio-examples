@@ -27,7 +27,7 @@ Simple endpoint to check whether the server is alive, giving back `200 OK`
 curl -i http://localhost:8080/health
 HTTP/1.1 200 OK
 Content-Length: 0
-Date: Wed, 11 Sep 2024 09:49:48 GMT
+Date: Thu, 12 Sep 2024 12:22:32 GMT
 Server: spatial
 ```
 
@@ -45,14 +45,32 @@ __Return value:__
 An array of
 - `id`:  park UUID
 - `name` : name of the park
-- `address`: street, city, zip of the park
+- `address`: street, city, zip, country of the park
 - `latitude`: langitude value
 - `latitude`: longitude value
 
 ```
 [
   {
-
+    "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
+    "longitude": 14.413999,
+    "latitude": 50.105849,
+    "name": "Stromovka",
+    "address": "Koňská stezka, 17000 Praha, Česko"
+  },
+  {
+    "name": "Letenské sady",
+    "longitude": 14.4202892,
+    "id": "CC9B4FCE-3630-4AAE-9CC6-C8DEBD0CED82",
+    "address": "Letenské sady 1574, 17000 Praha, Česko",
+    "latitude": 50.0959721
+  },
+  {
+    "latitude": 50.080292,
+    "longitude": 14.441514,
+    "name": "Riegrovy sady",
+    "address": "Riegrovy sady 28, 12000 Praha, Česko",
+    "id": "E74DC91A-4B55-40FD-86DE-C7C1A96C1CDB"
   }
 ]
 ```
@@ -70,14 +88,25 @@ __Return value:__
 An array of
 - `id`:  park UUID
 - `name` : name of the park
-- `address`: street, city, zip of the park
+- `address`: street, city, zip, country of the park
 - `latitude`: langitude value
 - `latitude`: longitude value
 
 ```
 [
   {
-
+    "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
+    "longitude": 14.413999,
+    "latitude": 50.105849,
+    "name": "Stromovka",
+    "address": "Koňská stezka, 17000 Praha, Česko"
+  },
+  {
+    "name": "Letenské sady",
+    "longitude": 14.4202892,
+    "id": "CC9B4FCE-3630-4AAE-9CC6-C8DEBD0CED82",
+    "address": "Letenské sady 1574, 17000 Praha, Česko",
+    "latitude": 50.0959721
   }
 ]
 ```
