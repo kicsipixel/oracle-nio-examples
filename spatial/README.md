@@ -1,6 +1,6 @@
 # Location Analysis using Oracle database
 
-Example shows one of the Spatial features of Oracle database. It lists resources(parks) questions based on the distance from your location.
+Example shows one of the Spatial features of Oracle database. It lists resources(parks) based on the distance from your location.
 
 ## Preparation
 To make it easier, you can seed the database with some data from a `.json` file. 
