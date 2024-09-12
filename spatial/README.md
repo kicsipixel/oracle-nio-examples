@@ -59,7 +59,7 @@ An array of
 
 #### Returns the list of  parks within the given distance
 
-- __URL:__ http://localhost:8080/api/v1/parks/:id
+- __URL:__ http://localhost:8080/api/v1/parks/distance?km=1
 - __HTTPMethod:__ `GET`
 
 ```
@@ -81,3 +81,7 @@ An array of
   }
 ]
 ```
+
+#### TODO
+- [ ] Visual representation - in prgrogress with MapKit JS
+- [ ] Enable to users to give their location instead of fixed one 
