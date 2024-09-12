@@ -118,7 +118,7 @@ struct WebsitesController {
         print(parks.count)
 
         let context = IndexContext(park: parks)
-        guard let html = mustacheLibrary.render(context, withTemplate: "filter") else {
+        guard let html = mustacheLibrary.render(context, withTemplate: "index") else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
         }
         return HTML(html: html)
