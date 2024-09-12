@@ -2,6 +2,8 @@
 
 Example shows one of the Spatial features of Oracle database. It lists resources(parks) based on the distance from your location.
 
+![](demo.gif)
+
 ## Preparation
 To make it easier, you can seed the database with some data from a `.json` file. 
 Simply run the application for the first time only with:
@@ -31,7 +33,7 @@ Date: Thu, 12 Sep 2024 12:22:32 GMT
 Server: spatial
 ```
 
-### 🗺️ Spatial
+### 🗺️ Spatial API
 #### Lists all the parks in the database
 
 - __URL:__ http://localhost:8080/api/v1/parks
@@ -110,7 +112,16 @@ An array of
   }
 ]
 ```
+###  🌍 Spatial web
+#### Lists all the parks in the database
+
+Open in browser: http://localhost:8080/api/v1/parks
+
+#### Returns the list of  parks within the given distance
+Open in browser: http://localhost:8080/api/v1/parks/filter/distance=1&unit=km
+
+Unit can be __km__ or __mile__.
 
 #### TODO
-- [ ] Visual representation - in prgrogress with MapKit JS
+- [x] Visual representation - in prgrogress with MapKit JS
 - [ ] Enable to users to give their location instead of fixed one 
