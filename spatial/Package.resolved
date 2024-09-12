@@ -127,6 +127,15 @@
       }
     },
     {
+      "identity" : "swift-mustache",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hummingbird-project/swift-mustache.git",
+      "state" : {
+        "revision" : "cde358e364ab26f2b72a5f70613cfb0a574de6c9",
+        "version" : "2.0.0-beta.3"
+      }
+    },
+    {
       "identity" : "swift-nio",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio.git",

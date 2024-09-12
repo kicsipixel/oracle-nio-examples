@@ -1,0 +1,15 @@
+{{<base}}
+{{$body}}
+<div id="map"></div>
+<script src="js/map.js"></script>
+<script>
+    var annotationData = [];
+
+    {{#park}}
+    annotationData.push({ name: "{{name}}", latitude: {{latitude}}, longitude: {{longitude}} });
+    {{/park}}
+
+    initializeMap(annotationData);
+</script>
+{{/body}}
+{{/base}}
