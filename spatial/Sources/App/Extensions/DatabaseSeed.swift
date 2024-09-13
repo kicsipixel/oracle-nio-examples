@@ -26,7 +26,7 @@ extension Application {
                 """
                 INSERT INTO spatialparks (
                     id
-                    ,NAME
+                    ,name
                     ,address
                     ,geometry
                     )

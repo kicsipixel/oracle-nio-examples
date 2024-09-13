@@ -1,8 +1,6 @@
-# Location Analysis using Oracle database
+# Location Analysis using Oracle database - API
 
 Example shows one of the Spatial features of Oracle database. It lists resources(parks) based on the distance from your location.
-
-![](demo.gif)
 
 ## Preparation
 To make it easier, you can seed the database with some data from a `.json` file. 
@@ -16,8 +14,10 @@ The database uses [`SDO_GEOMTERY`](https://docs.oracle.com/en/database/oracle/or
 ## Routes are as follows
 
 - __GET__: /health - Checks server health status
+- __POST__: /api/v1/parks - Creates a new park
 - __GET__: /api/v1/parks- Lists all the parks in the database
-- __GET__: /api/v1/parks/distance?mile=1 - Returns the list of parks which are within the distance
+- __GET__: /api/v1/parks/:id - Show a single park with id
+- __POST__: /api/v1/parks/filter - Returns the list of parks which are within the distance
 
 ### 🩺 Health
 Simple endpoint to check whether the server is alive, giving back `200 OK`
@@ -34,6 +34,26 @@ Server: spatial
 ```
 
 ### 🗺️ Spatial API
+#### Creates a new park with a name and coordinates
+
+- __URL:__ http://localhost:8080/api/v1/parks
+- __HTTPMethod:__ `POST`
+
+```
+curl -X "POST" "http://localhost:8080/api/v1/parks" \
+     -H 'Content-Type: application/json' \
+     -d $'{
+  "name": "Letenské sady",
+  "address": "Letenské sady 1574, 17000 Praha, Česko",
+  "coordinates": {
+    "latitude": 50.0959721
+    "longitude": 14.4202892
+  }
+}'
+```
+
+__Return value:__
+- `201 CREATED`
 #### Lists all the parks in the database
 
 - __URL:__ http://localhost:8080/api/v1/parks
@@ -48,42 +68,87 @@ An array of
 - `id`:  park UUID
 - `name` : name of the park
 - `address`: street, city, zip, country of the park
-- `latitude`: langitude value
-- `latitude`: longitude value
-
+- `coordinates` 
+    - `latitude`: langitude value
+    - `latitude`: longitude value
 ```
+
 [
   {
-    "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
-    "longitude": 14.413999,
-    "latitude": 50.105849,
+    "address": "Koňská stezka, 17000 Praha, Česko",
     "name": "Stromovka",
-    "address": "Koňská stezka, 17000 Praha, Česko"
+    "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
+    "coordinates": {
+      "latitude": 50.105849,
+      "longitude": 14.413999
+    }
   },
   {
+    "coordinates": {
+      "latitude": 50.0959721,
+      "longitude": 14.4202892
+    },
     "name": "Letenské sady",
-    "longitude": 14.4202892,
     "id": "CC9B4FCE-3630-4AAE-9CC6-C8DEBD0CED82",
-    "address": "Letenské sady 1574, 17000 Praha, Česko",
-    "latitude": 50.0959721
+    "address": "Letenské sady 1574, 17000 Praha, Česko"
   },
   {
-    "latitude": 50.080292,
-    "longitude": 14.441514,
-    "name": "Riegrovy sady",
     "address": "Riegrovy sady 28, 12000 Praha, Česko",
-    "id": "E74DC91A-4B55-40FD-86DE-C7C1A96C1CDB"
+    "id": "E74DC91A-4B55-40FD-86DE-C7C1A96C1CDB",
+    "name": "Riegrovy sady",
+    "coordinates": {
+      "latitude": 50.080292,
+      "longitude": 14.441514
+    }
   }
 ]
 ```
 
-#### Returns the list of  parks within the given distance
+#### Returns a single park with id
 
-- __URL:__ http://localhost:8080/api/v1/parks/distance?km=1
+- __URL:__ http://localhost:8080/api/v1/parks/:id
 - __HTTPMethod:__ `GET`
 
 ```
-curl "http://localhost:8080/api/v1/parks/distance?km=1"
+curl "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285"
+```
+
+__Return value:__
+- `id`:  park UUID
+- `name` : name of the park
+- `address`: street, city, zip, country of the park
+- `coordinates` 
+    - `latitude`: langitude value
+    - `latitude`: longitude value
+
+```
+{
+  "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
+  "address": "Koňská stezka, 17000 Praha, Česko",
+  "coordinates": {
+    "latitude": 50.105849,
+    "longitude": 14.413999
+  },
+  "name": "Stromovka"
+}
+```
+
+#### Returns the list of  parks within the given distance
+
+- __URL:__ http://localhost:8080/api/v1/parks/filter
+- __HTTPMethod:__ `POST`
+
+```
+curl -X "POST" "http://localhost:8080/api/v1/parks/filter" \
+     -H 'Content-Type: application/json' \
+     -d $'{
+            "userPosition": {
+              "longitude": 14.411944,
+              "latitude": 50.086389
+            },
+            "distance": 0.27,
+            "unit": "mile"
+      }'
 ```
 
 __Return value:__
@@ -91,9 +156,9 @@ An array of
 - `id`:  park UUID
 - `name` : name of the park
 - `address`: street, city, zip, country of the park
-- `latitude`: langitude value
-- `latitude`: longitude value
-
+- `coordinates` 
+    - `latitude`: langitude value
+    - `latitude`: longitude value
 ```
 [
   {
@@ -112,16 +177,3 @@ An array of
   }
 ]
 ```
-###  🌍 Spatial web
-#### Lists all the parks in the database
-
-Open in browser: http://localhost:8080/api/v1/parks
-
-#### Returns the list of  parks within the given distance
-Open in browser: http://localhost:8080/api/v1/parks/filter/distance=1&unit=km
-
-Unit can be __km__ or __mile__.
-
-#### TODO
-- [x] Visual representation - in prgrogress with MapKit JS
-- [ ] Enable to users to give their location instead of fixed one 

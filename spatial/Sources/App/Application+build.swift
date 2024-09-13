@@ -1,7 +1,6 @@
 import Foundation
 import Hummingbird
 import Logging
-import Mustache
 import OracleNIO
 
 /// Application arguments protocol. We use a protocol so we can call
@@ -30,9 +29,6 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     }()
 
     let router = buildRouter()
-    // Template library - Mustache
-    let library = try await MustacheLibrary(directory: "Resources/Templates")
-    assert(library.getTemplate(named: "base") != nil)
 
     /// Database configuration
     /// Use `docker exec -it ora23ai ./setPassword.sh Welcome1` to change thedefault random password
@@ -68,7 +64,6 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
 
     /// Controller
     ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
-    WebsitesController(mustacheLibrary: library, client: client, logger: logger).addRoutes(to: router)
 
     var app = Application(
         router: router,
@@ -82,7 +77,6 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     }
 
     app.addServices(client)
-
     return app
 }
 
@@ -93,13 +87,11 @@ func buildRouter() -> Router<AppRequestContext> {
     router.addMiddleware {
         // logging middleware
         LogRequestsMiddleware(.info)
-        FileMiddleware()
     }
 
     // Add health endpoint
     router.get("/health") { _, _ -> HTTPResponse.Status in
         .ok
     }
-
     return router
 }

@@ -22,7 +22,7 @@ let package = Package(
                           dependencies: [
                               .product(name: "ArgumentParser", package: "swift-argument-parser"),
                               .product(name: "Hummingbird", package: "hummingbird"),
-                              // Oracle-NIO
+                              // OracleNIO
                               .product(name: "OracleNIO", package: "oracle-nio"),
                               // Mustache
                               .product(name: "Mustache", package: "swift-mustache"),
