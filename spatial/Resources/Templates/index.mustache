@@ -5,9 +5,9 @@
 <script>
     var annotationData = [];
 
-    {{#park}}
+    {{#parks}}
     annotationData.push({ name: "{{name}}", latitude: {{latitude}}, longitude: {{longitude}} });
-    {{/park}}
+    {{/parks}}
 
     initializeMap(annotationData);
 </script>

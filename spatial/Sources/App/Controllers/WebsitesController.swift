@@ -25,7 +25,7 @@ struct WebsitesController {
 
     @Sendable
     func index(request _: Request, context _: some RequestContext) async throws -> HTML {
-        var parks = [ParkContext]()
+        var parks = [Park]()
         try await client.withConnection { conn in
             let rows = try await conn.execute(
                 """
@@ -42,16 +42,16 @@ struct WebsitesController {
             for try await (id, name, address, latitude, longitude) in rows
                 .decode((UUID, String, String, Double, Double).self)
             {
-                let park = ParkContext(id: id,
-                                       name: name,
-                                       address: address,
-                                       latitude: latitude,
-                                       longitude: longitude)
+                let park = Park(id: id,
+                                name: name,
+                                address: address,
+                                latitude: latitude,
+                                longitude: longitude)
                 parks.append(park)
             }
         }
 
-        let context = IndexContext(park: parks)
+        let context = IndexContext(parks: parks)
         guard let html = mustacheLibrary.render(context, withTemplate: "index") else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
         }
@@ -63,7 +63,7 @@ struct WebsitesController {
         let queryString = try context.parameters.require("distance", as: String.self)
 
         // Variables
-        var parks = [ParkContext]()
+        var parks = [Park]()
         var parameters: [String: Any] = [:]
 
         let pairs = queryString.split(separator: "&")
@@ -106,18 +106,18 @@ struct WebsitesController {
             for try await (id, name, address, latitude, longitude) in rows
                 .decode((UUID, String, String, Double, Double).self)
             {
-                let park = ParkContext(id: id,
-                                       name: name,
-                                       address: address,
-                                       latitude: latitude,
-                                       longitude: longitude)
+                let park = Park(id: id,
+                                name: name,
+                                address: address,
+                                latitude: latitude,
+                                longitude: longitude)
                 parks.append(park)
             }
         }
 
         print(parks.count)
 
-        let context = IndexContext(park: parks)
+        let context = IndexContext(parks: parks)
         guard let html = mustacheLibrary.render(context, withTemplate: "index") else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
         }
@@ -126,13 +126,5 @@ struct WebsitesController {
 }
 
 struct IndexContext {
-    let park: [ParkContext]
-}
-
-struct ParkContext {
-    let id: UUID?
-    let name: String
-    let address: String
-    let latitude: Double
-    let longitude: Double
+    let parks: [Park]
 }
