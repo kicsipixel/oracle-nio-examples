@@ -162,18 +162,22 @@ An array of
 ```
 [
   {
-    "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
-    "longitude": 14.413999,
-    "latitude": 50.105849,
+    "address": "Koňská stezka, 17000 Praha, Česko",
     "name": "Stromovka",
-    "address": "Koňská stezka, 17000 Praha, Česko"
+    "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
+    "coordinates": {
+      "latitude": 50.105849,
+      "longitude": 14.413999
+    }
   },
   {
+    "coordinates": {
+      "latitude": 50.0959721,
+      "longitude": 14.4202892
+    },
     "name": "Letenské sady",
-    "longitude": 14.4202892,
     "id": "CC9B4FCE-3630-4AAE-9CC6-C8DEBD0CED82",
-    "address": "Letenské sady 1574, 17000 Praha, Česko",
-    "latitude": 50.0959721
+    "address": "Letenské sady 1574, 17000 Praha, Česko"
   }
 ]
 ```
