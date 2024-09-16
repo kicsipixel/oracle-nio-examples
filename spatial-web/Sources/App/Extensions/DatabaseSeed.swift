@@ -7,11 +7,9 @@ import OracleNIO
 /// The `filename` and `fileURLWithPath` are hard coded. 🤦
 /// The `decoder` uses `Seed` model
 extension Application {
-    func seedDatabase(_ app: any ApplicationProtocol, config: OracleConnection.Configuration) async throws {
-        let publicDirectory = app.directory.publicDirectory
-
-        let data = try Data(contentsOf: URL(fileURLWithPath: publicDirectory)
-            .appendingPathComponent("parksofprague.json", isDirectory: false))
+    func seedDatabase(config: OracleConnection.Configuration) async throws {
+        let source = Bundle.module.bundleURL.appendingPathComponent("parksofprague.json")
+        let data = try Data(contentsOf: source)
         let features = try JSONDecoder().decode(Seed.self, from: data)
 
         let connection = try await OracleConnection.connect(

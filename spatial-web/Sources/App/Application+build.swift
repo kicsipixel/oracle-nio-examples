@@ -41,17 +41,19 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
 
     let router = buildRouter()
     // Template library - Mustache
-    let library = try await MustacheLibrary(directory: "Resources/Templates")
+    let library = try await MustacheLibrary(directory: Bundle.module.bundleURL.path)
     assert(library.getTemplate(named: "base") != nil)
+
+    let env = try await Environment.dotEnv()
 
     /// Database configuration
     /// Use `docker exec -it ora23ai ./setPassword.sh Welcome1` to change thedefault random password
     let config = OracleConnection.Configuration(
-        host: "127.0.0.1",
+        host: env.get("DATABASE_HOST") ?? "127.0.0.1",
         port: 1522,
-        service: .sid("FREE"),
-        username: "SYSTEM",
-        password: "Welcome1")
+        service: .sid(env.get("SID") ?? "XE"),
+        username: env.get("DATABASE_USERNAME") ?? "SYSTEM",
+        password: env.get("DATABASE_PASSWORD") ?? "secr3t")
 
     let connection = try await OracleConnection.connect(
         configuration: config,
@@ -61,11 +63,11 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     /// Create the table in the database using the new `IF NOT EXISTS` keyword
     try await connection.execute(
         """
-             CREATE TABLE IF NOT EXISTS spatialparks (
-               id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
-               name VARCHAR2 (100),
-               address VARCHAR2 (100),
-               geometry SDO_GEOMETRY
+        CREATE TABLE IF NOT EXISTS spatialparks (
+            id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
+        name VARCHAR2 (100),
+        address VARCHAR2 (100),
+        geometry SDO_GEOMETRY
         )
         """,
         logger: logger)
@@ -88,7 +90,7 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
         logger: logger)
 
     if arguments.seed {
-        try await app.seedDatabase(app, config: config)
+        try await app.seedDatabase(config: config)
     }
 
     app.addServices(client)

@@ -27,7 +27,8 @@ let package = Package(
                               // Mustache
                               .product(name: "Mustache", package: "swift-mustache"),
                           ],
-                          path: "Sources/App"),
+                          path: "Sources/App",
+                          resources: [.process("Resources"), .process("Public")]),
         .testTarget(name: "AppTests",
                     dependencies: [
                         .byName(name: "App"),
