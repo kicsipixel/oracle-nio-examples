@@ -9,6 +9,14 @@ Example shows one of the Spatial features of Oracle database. It lists resources
 
 ## Preparation
 To make it easier, you can seed the database with some data from a `.json` file. 
+For database credentials, make a`.env` file:
+```
+DATABASE_HOST=127.0.0.1
+DATABASE_PORT=1522
+SID=
+DATABASE_USERNAME=
+DATABASE_PASSWORD=
+```
 Simply run the application for the first time only with:
 ```
 swift run App --seed
