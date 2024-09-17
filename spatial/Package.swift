@@ -14,8 +14,6 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.3.0"),
         // OracleNIO
         .package(url: "https://github.com/lovetodream/oracle-nio.git", from: "1.0.0-beta.1"),
-        // Mustache
-        .package(url: "https://github.com/hummingbird-project/swift-mustache.git", from: "2.0.0-beta.3"),
     ],
     targets: [
         .executableTarget(name: "App",
@@ -24,8 +22,6 @@ let package = Package(
                               .product(name: "Hummingbird", package: "hummingbird"),
                               // OracleNIO
                               .product(name: "OracleNIO", package: "oracle-nio"),
-                              // Mustache
-                              .product(name: "Mustache", package: "swift-mustache"),
                           ],
                           path: "Sources/App"),
         .testTarget(name: "AppTests",

@@ -32,8 +32,8 @@ struct ParksController<Context: RequestContext> {
     func create(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
         let park = try await request.decode(as: Park.self, context: context)
 
-        try await client.withConnection { conn in
-            let rows = try await conn.execute(
+        _ = try await client.withConnection { conn in
+            try await conn.execute(
                 """
                 INSERT INTO spatialparks (
                     name
