@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/lovetodream/oracle-nio.git",
       "state" : {
-        "branch" : "feature/oracle-json",
-        "revision" : "d270b05524f566d773eacbc5b639af1c9cbe1d37"
+        "branch" : "main",
+        "revision" : "cbedc27be223054fbd03639f5c124334f7038e35"
       }
     },
     {

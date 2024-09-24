@@ -18,5 +18,5 @@ struct Query: Codable {
 
 // MARK: - Condition
 struct Condition: Codable {
-    let field, value: String
+    let key, value: String
 }

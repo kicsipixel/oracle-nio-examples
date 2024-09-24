@@ -81,24 +81,7 @@ struct PeopleController<Context: RequestContext> {
     func filter(request: Request, context: Context) async throws -> [Person] {
         let filter = try await request.decode(as: Filter.self, context: context)
         var people = [Person]()
-        
-        let level1Field = filter.query[0].criteria[0].group[0].conditions[0].field
-        let level1Value = filter.query[0].criteria[0].group[0].conditions[0].value
-        guard let level1Operator = filter.query[0].criteria[0].group[0].groupOperator else {
-            throw HTTPError(.internalServerError)
-        }
-        
-        
-        let query =
-        """
-            SELECT *
-             FROM people
-             WHERE JSON_VALUE(people_list, '$.\(level1Field)' = '\(level1Value)'
-               \(level1Operator) (JSON_VALUE(people_list, '$.nat') = 'DE'
-                   );
-        """
-        
-        print(query)
+         print(filter)
         return people
     }
 }
