@@ -1,2 +1,2 @@
-# TESTING PURPOSES ONLY
+# Documentation is coming...
 Hummingbird server framework project
