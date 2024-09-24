@@ -8,5 +8,4 @@ xcuserdata/
 **/.vscode/*
 !/.vscode/hummingbird.code-snippets
 **/.env
-
-**/Wallet_szabolcstothdb/*
+**/Wallet_*
