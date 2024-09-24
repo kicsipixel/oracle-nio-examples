@@ -1,0 +1,56 @@
+{
+  "query": [
+    {
+      "criteria": [
+        {
+          "group": [
+            {
+              "conditions": [
+                {
+                  "field": "name.title",
+                  "value": "Mr"
+                },
+                {
+                  "field": "nat",
+                  "value": "DE"
+                }
+              ],
+              "operator": "AND"
+            }
+          ]
+        },
+        {
+          "group": [
+            {
+              "conditions": [
+                {
+                  "field": "hobbies",
+                  "value": "karate"
+                }
+              ]
+            }
+          ],
+          "operator": "OR"
+        }
+      ]
+    }
+  ]
+}
+/*
+Graphical representation of the JSON structure:
+
+query
+└── criteria
+    ├── group
+    │   └── conditions
+    │       ├── field: "name.title"
+    │       │   └── value: "Mr"
+    │       └── field: "nat"
+    │           └── value: "DE"
+    │   operator: "AND"
+    └── group
+        └── conditions
+            └── field: "hobbies"
+                └── value: "karate"
+    operator: "OR"
+*/
