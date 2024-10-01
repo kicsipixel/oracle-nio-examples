@@ -1,4 +1,4 @@
-# Example to use JSON natively with JSON data type with ABD in OCI
+# Example to use JSON natively with JSON data type with ADB in OCI
 
 This example demonstrates how to natively write, read, and query JSON data using Oracle Database 23ai as an [Autonomous Database](https://www.oracle.com/autonomous-database/) in Oracle Cloud Infrastructure (OCI).
 
