@@ -81,7 +81,10 @@ struct PeopleController<Context: RequestContext> {
     func filter(request: Request, context: Context) async throws -> [Person] {
         let filter = try await request.decode(as: Filter.self, context: context)
         var people = [Person]()
-         print(filter)
+         
+      let query =
+      """
+"""
         return people
     }
 }

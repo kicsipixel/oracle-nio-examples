@@ -1,22 +1,20 @@
 import Foundation
 
-// MARK: - Filter
 struct Filter: Codable {
-    let query: [Query]
+  let query: [Query]
 }
 
-// MARK: - Query
 struct Query: Codable {
-    let conditions: [Condition]
-    let queryOperator: String
-    
-    enum CodingKeys: String, CodingKey {
-        case conditions
-        case queryOperator = "operator"
-    }
+  let conditions: [Condition]
+  let queryOperator: String
+  
+  enum CodingKeys: String, CodingKey {
+    case conditions
+    case queryOperator = "operator"
+  }
 }
 
-// MARK: - Condition
 struct Condition: Codable {
-    let key, value: String
+  let key: String
+  let value: String
 }
