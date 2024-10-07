@@ -108,14 +108,7 @@ struct PeopleController<Context: RequestContext> {
     func filter(request: Request, context: Context) async throws -> [Person] {
         let filter = try await request.decode(as: Filter.self, context: context)
         var people = [Person]()
-<<<<<<< HEAD
-         
-      let query =
-      """
-"""
-        return people
-=======
-        
+      
         return try await client.withConnection { conn in
             if filter.query.count == 1 {
                 let conditions = filter.query[0].conditions
@@ -161,7 +154,6 @@ struct PeopleController<Context: RequestContext> {
                 throw HTTPError(.badRequest, message: "Invalid filter: query must contain 1 condition.")
             }
         }
->>>>>>> cb10b6fcb1f9ddd1adc17d4e2040131ecc6700eb
     }
 }
 
