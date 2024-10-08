@@ -1,0 +1,52 @@
+openapi: '3.1.0'
+info:
+  title: Sample API using OpenAPI
+  description: API server built on [Hummingbird](https://hummingbird.codes/), [OracleNIO](https://github.com/lovetodream/oracle-nio) and [Swift OpenAPI Generator](https://github.com/apple/swift-openapi-generator).
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: This is the server.
+
+paths:
+# Responses with 200 OK to curl -i http://localhost:8080/health
+  /health:
+    get:
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Server health status
+
+# Responses with Hello, World! 🌍 to curl http://localhost:8080
+  /:
+    get:
+      operationId: hello
+      responses:
+        '200':
+          description: Greetings
+          content:
+            text/plain:
+              schema:
+                type: string
+  
+  /api/v1/parks:
+    get:
+      operationId: listParks
+      responses:
+        '200':
+          description: Returns a list of 🌳 parks.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Park'
+components:
+  schemas:
+    Park:
+      type: object
+      properties:
+        name:
+          type: string
+        comments:
+          type: string
