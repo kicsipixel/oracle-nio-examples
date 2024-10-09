@@ -43,7 +43,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Park'
 
-  # New route to get a park by ID
+  # Responses with a park, which ID was given to curl http://localhost:8080/api/parks/{id}
   /api/v1/parks/{id}:
     get:
       operationId: getParkById
@@ -63,6 +63,24 @@ paths:
                 $ref: '#/components/schemas/Park'
         '404':
           description: Park not found
+        '500':
+          description: Internal server error
+
+  # Creates a new park
+  /api/v1/parks/create:
+    post:
+      operationId: createPark
+      requestBody:
+        description: Park object that needs to be added
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Park'
+      responses:
+        '201':
+          description: Park created successfully
+        '400':
+          description: Bad request/invalid input
         '500':
           description: Internal server error
 

@@ -9,17 +9,17 @@ import OracleNIO
 struct HummingbirdArguments: AsyncParsableCommand {
     @Option(name: .shortAndLong)
     var hostname = "127.0.0.1"
-    
+
     @Option(name: .shortAndLong)
     var port = 8080
-    
+
     func run() async throws {
         let router = Router()
         router.middlewares.add(LogRequestsMiddleware(.info))
-        
+
         let env = try await Environment.dotEnv()
         let resourcePath = Bundle.module.bundleURL.path
-        
+
         /// Database configuration
         /// Use your connection String to find the relevant information
         let config = try OracleConnection.Configuration(
@@ -42,42 +42,44 @@ struct HummingbirdArguments: AsyncParsableCommand {
                 )
             )
         )
-        
+
         let connection = try await OracleConnection.connect(
             configuration: config,
             id: 1
         )
-        
+
         try await connection.execute(
             """
                 CREATE TABLE IF NOT EXISTS openapi_parks (
                 id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
                 name VARCHAR2(50),
-                coordinates SDO_GEOMETRY,
-                comments VARCHAR(100)
+                coordinates SDO_GEOMETRY
             )
             """
         )
-        
+
         try await connection.close()
-        
+
         let client = OracleClient(configuration: config)
         let api = APIServiceImpl(client: client)
-        
+
         try api.registerHandlers(on: router)
-        
-        let app = Application(
+
+        var app = Application(
             router: router,
             configuration: .init(address: .hostname(hostname, port: port))
         )
-        
-        try await withThrowingDiscardingTaskGroup { group in
-            group.addTask {
-                await client.run()
-            }
-            group.addTask {
-                try await app.runService()
-            }
-        }
+
+      app.addServices(client)
+      try await app.runService()
+
+//        try await withThrowingDiscardingTaskGroup { group in
+//            group.addTask {
+//                await client.run()
+//            }
+//            group.addTask {
+//                try await app.runService()
+//            }
+//        }
     }
 }
