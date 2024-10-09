@@ -43,6 +43,22 @@ paths:
                 items:
                   $ref: "#/components/schemas/Park"
 
+    post:
+      operationId: createPark
+      requestBody:
+        description: Park object that needs to be added
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Park"
+      responses:
+        "201":
+          description: Park created successfully
+        "400":
+          description: Bad request/invalid input
+        "500":
+          description: Internal server error
+
   # Responses with a park, which ID was given to curl http://localhost:8080/api/v1/parks/{id}
   /api/v1/parks/{id}:
     get:
@@ -66,26 +82,6 @@ paths:
         "500":
           description: Internal server error
 
-  # Creates a new park
-  /api/v1/parks/create:
-    post:
-      operationId: createPark
-      requestBody:
-        description: Park object that needs to be added
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Park"
-      responses:
-        "201":
-          description: Park created successfully
-        "400":
-          description: Bad request/invalid input
-        "500":
-          description: Internal server error
-
-  # Updates an existing park
-  /api/v1/parks/update/{id}:
     put:
       operationId: updatePark
       parameters:
