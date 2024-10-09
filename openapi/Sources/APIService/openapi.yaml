@@ -1,7 +1,7 @@
 openapi: '3.1.0'
 info:
   title: Sample API using OpenAPI
-  description: API server built on [Hummingbird](https://hummingbird.codes/), [OracleNIO](https://github.com/lovetodream/oracle-nio) and [Swift OpenAPI Generator](https://github.com/apple/swift-openapi-generator).
+  description: API server built on Hummingbird, OracleNIO and Swift OpenAPI Generator.
   version: 1.0.0
 
 servers:
@@ -9,7 +9,7 @@ servers:
     description: This is the server.
 
 paths:
-# Responses with 200 OK to curl -i http://localhost:8080/health
+  # Responses with 200 OK to curl -i http://localhost:8080/health
   /health:
     get:
       operationId: healthCheck
@@ -17,7 +17,7 @@ paths:
         '200':
           description: Server health status
 
-# Responses with Hello, World! 🌍 to curl http://localhost:8080
+  # Responses with Hello, World! 🌍 to curl http://localhost:8080
   /:
     get:
       operationId: hello
@@ -29,6 +29,7 @@ paths:
               schema:
                 type: string
   
+  # Responses with the list of parks to curl http://localhost:8080/api/v1/parks
   /api/v1/parks:
     get:
       operationId: listParks
@@ -41,12 +42,44 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Park'
+
+  # New route to get a park by ID
+  /api/v1/parks/{id}:
+    get:
+      operationId: getParkById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Returns a park by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Park'
+        '404':
+          description: Park not found
+        '500':
+          description: Internal server error
+
 components:
   schemas:
     Park:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         name:
           type: string
-        comments:
-          type: string
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
