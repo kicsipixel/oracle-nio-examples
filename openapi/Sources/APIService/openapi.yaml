@@ -1,4 +1,4 @@
-openapi: '3.1.0'
+openapi: "3.1.0"
 info:
   title: Sample API using OpenAPI
   description: API server built on Hummingbird, OracleNIO and Swift OpenAPI Generator.
@@ -14,7 +14,7 @@ paths:
     get:
       operationId: healthCheck
       responses:
-        '200':
+        "200":
           description: Server health status
 
   # Responses with Hello, World! 🌍 to curl http://localhost:8080
@@ -22,28 +22,28 @@ paths:
     get:
       operationId: hello
       responses:
-        '200':
+        "200":
           description: Greetings
           content:
             text/plain:
               schema:
                 type: string
-  
+
   # Responses with the list of parks to curl http://localhost:8080/api/v1/parks
   /api/v1/parks:
     get:
       operationId: listParks
       responses:
-        '200':
+        "200":
           description: Returns a list of 🌳 parks.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Park'
+                  $ref: "#/components/schemas/Park"
 
-  # Responses with a park, which ID was given to curl http://localhost:8080/api/parks/{id}
+  # Responses with a park, which ID was given to curl http://localhost:8080/api/v1/parks/{id}
   /api/v1/parks/{id}:
     get:
       operationId: getParkById
@@ -55,15 +55,15 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Returns a park by ID
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Park'
-        '404':
+                $ref: "#/components/schemas/Park"
+        "404":
           description: Park not found
-        '500':
+        "500":
           description: Internal server error
 
   # Creates a new park
@@ -75,13 +75,40 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Park'
+              $ref: "#/components/schemas/Park"
       responses:
-        '201':
+        "201":
           description: Park created successfully
-        '400':
+        "400":
           description: Bad request/invalid input
-        '500':
+        "500":
+          description: Internal server error
+
+  # Updates an existing park
+  /api/v1/parks/update/{id}:
+    put:
+      operationId: updatePark
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Park object that needs to be updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Park"
+      responses:
+        "200":
+          description: Park updated successfully
+        "400":
+          description: Bad request/invalid input
+        "404":
+          description: Park not found
+        "500":
           description: Internal server error
 
 components:
