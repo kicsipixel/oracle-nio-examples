@@ -8,9 +8,5 @@ Examples to demonstrate [Hummingbird 2.0](https://hummingbird.codes) with [Oracl
 - [spatial](https://github.com/kicsipixel/oracle-nio-examples/tree/main/spatial) - Example to use SDO_GEOMETRY for location analysis
 - [spatial-web](https://github.com/kicsipixel/oracle-nio-examples/tree/main/spatial-web) - Example to use SDO_GEOMETRY for location analysis, showing result on map using [MapKit JS](https://developer.apple.com/maps/web/)
 - [json](https://github.com/kicsipixel/oracle-nio-examples/tree/main/json) - Example to use JSON natively with JSON data type with ADB in OCI
+- [openapi](https://github.com/kicsipixel/oracle-nio-examples/tree/main/openapi) - Example to use Swift OpenAPI Generator with OracleNIO and ADB in OCI
 
-## License
-
-_**Oracle** is a registered trademark of **Oracle Corporation**. Any use of their trademark is under the established [trademark guidelines](https://www.oracle.com/legal/trademarks.html) and does not imply any affiliation with or endorsement by them, and all rights are reserved by them._
-
-_**Swift** is a registered trademark of **Apple, Inc**. Any use of their trademark does not imply any affiliation with or endorsement by them, and all rights are reserved by them._
