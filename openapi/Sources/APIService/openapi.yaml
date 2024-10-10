@@ -107,6 +107,23 @@ paths:
         "500":
           description: Internal server error
 
+    delete:
+      operationId: deletePark
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Park deleted successfully
+        "404":
+          description: Park not found
+        "500":
+          description: Internal server error
+
 components:
   schemas:
     Park:

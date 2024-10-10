@@ -1,5 +1,5 @@
-// swift-tools-version:6.0
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+  // swift-tools-version:6.0
+  // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
@@ -34,9 +34,12 @@ let package = Package(
       name: "App",
       dependencies: [
         .target(name: "APIService"),
-        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+        // Hummingbird
         .product(name: "Hummingbird", package: "hummingbird"),
+        .product(name: "ArgumentParser", package: "swift-argument-parser"),
+        // OpenAPI
         .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
+        // Database
         .product(name: "OracleNIO", package: "oracle-nio"),
       ],
       resources: [.process("Resources")]
