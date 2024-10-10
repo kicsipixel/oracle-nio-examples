@@ -1,7 +1,7 @@
 openapi: "3.1.0"
 info:
   title: Sample API using OpenAPI
-  description: API server built on Hummingbird, OracleNIO and Swift OpenAPI Generator.
+  description: API server built on [Hummingbird](https://hummingbird.codes/), [OracleNIO](https://github.com/lovetodream/oracle-nio) and [Swift OpenAPI Generator](https://github.com/apple/swift-openapi-generator).
   version: 1.0.0
 
 servers:
@@ -9,17 +9,25 @@ servers:
     description: This is the server.
 
 paths:
-  # Responses with 200 OK to curl -i http://localhost:8080/health
+  # Health 
+  # curl -i http://localhost:8080/health
+  #
   /health:
     get:
+      summary: Server health status
+      description: Responses with 200 OK
       operationId: healthCheck
       responses:
         "200":
           description: Server health status
 
-  # Responses with Hello, World! 🌍 to curl http://localhost:8080
+  # Greetings
+  # curl http://localhost:8080
+  #
   /:
     get:
+      summary: Greetings
+      description: Responses with a simple string using emoji. Hello, World! 🌍 
       operationId: hello
       responses:
         "200":
@@ -29,24 +37,41 @@ paths:
               schema:
                 type: string
 
-  # Responses with the list of parks to curl http://localhost:8080/api/v1/parks
+  # List
+  # curl http://localhost:8080/api/v1/parks
+  #
   /api/v1/parks:
     get:
+      summary: List of all 🌳.
+      description: Returns with all parks in the database
       operationId: listParks
       responses:
         "200":
-          description: Returns a list of 🌳 parks.
+          description: JSON array of parks
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/Park"
-
+  
+  # Create
+  # curl -X "POST" "http://localhost:8080/api/v1/parks" \
+  #      -H 'Content-Type: application/json' \
+  #      -d $'{
+  #    "name": "Stromovka",
+  #    "coordinates": {
+  #      "longitude": 14.413999,
+  #      "latitude": 50.105849
+  #    }
+  #  }'
+  #
     post:
+      summary: Create a park
+      description: Saves park to the database
       operationId: createPark
       requestBody:
-        description: Park object that needs to be added
+        description: JSON array of the park details supposed to be saved
         content:
           application/json:
             schema:
@@ -59,9 +84,14 @@ paths:
         "500":
           description: Internal server error
 
-  # Responses with a park, which ID was given to curl http://localhost:8080/api/v1/parks/{id}
+  # Show
+  # curl "http://localhost:8080/api/v1/parks/2408B278-1518-DB79-E063-485D000A4B80" \
+  #   -H 'Content-Type: application/json'
+  #
   /api/v1/parks/{id}:
     get:
+      summary: Show park with id
+      description: Returns with park with specified id
       operationId: getParkById
       parameters:
         - in: path
@@ -72,7 +102,7 @@ paths:
             format: uuid
       responses:
         "200":
-          description: Returns a park by ID
+          description: JSON array of the park details with specified id
           content:
             application/json:
               schema:
@@ -81,8 +111,21 @@ paths:
           description: Park not found
         "500":
           description: Internal server error
-
+  
+  # Update
+  # curl -X "PUT" "http://localhost:8080/api/v1/parks/2408B278-1518-DB79-E063-485D000A4B80" \
+  #      -H 'Content-Type: application/json' \
+  #      -d $'{
+  #    "name": "Stromovka",
+  #    "coordinates": {
+  #      "longitude": 14.413999,
+  #      "latitude": 50.105849
+  #    }
+  #  }'
+  #
     put:
+      summary: Update 
+      description: Updates park with specified id
       operationId: updatePark
       parameters:
         - in: path
@@ -92,7 +135,7 @@ paths:
             type: string
             format: uuid
       requestBody:
-        description: Park object that needs to be updated
+        description: JSON array of the park object that needs to be updated
         content:
           application/json:
             schema:
@@ -106,8 +149,14 @@ paths:
           description: Park not found
         "500":
           description: Internal server error
-
+  
+  # Delete
+  # curl -X "DELETE" "http://localhost:8080/api/v1/parks/2412D31E-B8F0-57E3-E063-485D000A41DC" \
+  #   -H 'Content-Type: application/json'
+  #
     delete:
+      summary: Delete
+      description: Deletes park with specified id 
       operationId: deletePark
       parameters:
         - in: path
