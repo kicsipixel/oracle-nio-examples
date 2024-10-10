@@ -22,7 +22,7 @@ struct APIServiceImpl: APIProtocol {
     try await self.client.withConnection { conn in
       let rows = try await conn.execute(
         """
-         SELECT
+        SELECT
             p.id,
             p.name,
             p.coordinates.SDO_POINT.X AS longitude,
@@ -83,14 +83,14 @@ struct APIServiceImpl: APIProtocol {
     _ = try await client.withConnection { conn in
       try await conn.execute(
         """
-            INSERT INTO openapi_parks (
-              name,
-              coordinates
-            )
-            VALUES (
-              \(name)
-              ,SDO_GEOMETRY(\(latitude), \(longitude))
-            )
+        INSERT INTO openapi_parks (
+          name,
+          coordinates
+        )
+        VALUES (
+          \(name)
+          ,SDO_GEOMETRY(\(latitude), \(longitude))
+        )
         """)
     }
     
@@ -123,10 +123,10 @@ struct APIServiceImpl: APIProtocol {
         (UUID).self) {
         try await conn.execute(
           """
-              UPDATE openapi_parks
-               SET name = \(name),
-                   coordinates = SDO_GEOMETRY(\(latitude), \(longitude))
-             WHERE id = HEXTORAW(\(guid))
+          UPDATE openapi_parks
+           SET name = \(name),
+               coordinates = SDO_GEOMETRY(\(latitude), \(longitude))
+          WHERE id = HEXTORAW(\(guid))
           """)
         return .ok(.init())
       }

@@ -23,13 +23,9 @@ struct HummingbirdArguments: AsyncParsableCommand {
       /// Database configuration
       /// Use your connection String to find the relevant information
     let config = try OracleConnection.Configuration(
-      host: env.get("DATABASE_HOST")
-      ?? "adb.eu-frankfurt-1.oraclecloud.com",
+      host: env.get("DATABASE_HOST") ?? "adb.eu-frankfurt-1.oraclecloud.com",
       port: env.get("DATABASE_PORT").flatMap(Int.init(_:)) ?? 1522,
-      service: .serviceName(
-        env.get("DATABASE_SERVICE_NAME")
-        ?? "service_low.adb.oraclecloud.com"
-      ),
+      service: .serviceName(env.get("DATABASE_SERVICE_NAME") ?? "service_low.adb.oraclecloud.com"),
       username: env.get("DATABASE_USERNAME") ?? "ADMIN",
       password: env.get("DATABASE_PASSWORD") ?? "Secr3t",
       tls: .require(
