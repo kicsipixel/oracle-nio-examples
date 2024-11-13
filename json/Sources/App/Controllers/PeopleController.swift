@@ -23,7 +23,7 @@ struct PeopleController<Context: RequestContext> {
         try await client.withConnection { conn in
             let rows = try await conn.execute(
                 """
-                SELECT * from people
+                SELECT id, people_list from people
                 """,
                 logger: logger)
             

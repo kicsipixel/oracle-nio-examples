@@ -1,6 +1,6 @@
 # Example Code
 
-Read the [following instructions how to run](https://medium.com/oracledevs/run-oracle-23ai-as-a-free-autonomous-db-container-on-macbook-pro-d83a90a44906) or [this one](https://ronekins.com/2024/07/02/run-oracle-database-23ai-free-on-mac-computers-with-apple-silicon/) Oracle Database 23ai on your local machine.
+Follow the [link](https://blogs.oracle.com/database/post/announcing-oracle-database-23ai-free-container-images-for-armbased-apple-macbook-computers?source=:so:li:or:awr:odb:::&SC=:so:li:or:awr:odb:::&pcode=) to setup Oracle Database 23ai on ARM-based Mac.
 
 Examples to demonstrate [Hummingbird 2.0](https://hummingbird.codes) with [OracleNIO](https://github.com/lovetodream/oracle-nio/tree/main).
 
