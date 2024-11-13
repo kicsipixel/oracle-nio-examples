@@ -37,10 +37,10 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     /// Use `docker exec -it ora23ai ./setPassword.sh Welcome1` to change thedefault random password
     let config = OracleConnection.Configuration(
         host: "127.0.0.1",
-        port: 1522,
+        port: 1521,
         service: .sid("FREE"),
         username: "SYSTEM",
-        password: "Welcome1")
+        password: "OracleIsAwesome")
 
     let connection = try await OracleConnection.connect(
         configuration: config,
