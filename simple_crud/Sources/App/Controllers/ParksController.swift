@@ -134,7 +134,7 @@ struct ParksController<Context: RequestContext> {
       if deletedRows == 0 {
         return .notFound
       }
-      return .ok
+      return .noContent
     }
   }
 }
