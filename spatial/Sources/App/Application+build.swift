@@ -8,90 +8,122 @@ import OracleNIO
 /// Any variables added here also have to be added to `App` in App.swift and
 /// `TestArguments` in AppTest.swift
 public protocol AppArguments {
-    var hostname: String { get }
-    var port: Int { get }
-    var logLevel: Logger.Level? { get }
-    var seed: Bool { get }
+  var hostname: String { get }
+  var port: Int { get }
+  var logLevel: Logger.Level? { get }
+  var seed: Bool { get }
 }
 
 // Request context used by application
 typealias AppRequestContext = BasicRequestContext
 
-public func buildApplication(_ arguments: some AppArguments) async throws -> some ApplicationProtocol {
-    let environment = Environment()
-    let logger = {
-        var logger = Logger(label: "spatial")
-        logger.logLevel =
-            arguments.logLevel ??
-            environment.get("LOG_LEVEL").map { Logger.Level(rawValue: $0) ?? .info } ??
-            .info
-        return logger
-    }()
+///  Build application
+/// - Parameter arguments: application arguments
+public func buildApplication(_ arguments: some AppArguments) async throws
+  -> some ApplicationProtocol
+{
+  let environment = Environment()
+  let logger = {
+    var logger = Logger(label: "spatial")
+    logger.logLevel =
+      arguments.logLevel ?? environment.get("LOG_LEVEL").flatMap { Logger.Level(rawValue: $0) }
+      ?? .info
+    return logger
+  }()
 
-    let router = buildRouter()
+  let router = buildRouter()
+  let env = try await Environment.dotEnv()
 
-    /// Database configuration
-    /// Use `docker exec -it ora23ai ./setPassword.sh Welcome1` to change thedefault random password
-    let config = OracleConnection.Configuration(
-        host: "127.0.0.1",
-        port: 1522,
-        service: .sid("FREE"),
-        username: "SYSTEM",
-        password: "Welcome1")
+  /// Database configuration
+  /// Use `docker  run --name oracle23ai -p 1521:1521 -e ORACLE_PWD=OracleIsAwesome container-registry.oracle.com/database/free:latest-lite`
+  let config = OracleConnection.Configuration(
+    host: env.get("DATABASE_HOST") ?? "127.0.0.1",
+    service: .serviceName(env.get("DATABASE_SERVICE_NAME") ?? "FREE"),
+    username: env.get("DATABASE_USERNAME") ?? "SYSTEM",
+    password: env.get("DATABASE_PASSWORD") ?? "OracleIsAwesome"
+  )
 
-    let connection = try await OracleConnection.connect(
-        configuration: config,
-        id: 1,
-        logger: logger)
+  /// Remote Database configuration
+  /// Use Connection string: `(description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.eu-frankfurt-1.oraclecloud.com))(connect_data=(service_name=gdb965aee735fa8_szabolcstothdb_low.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))`
+  // let resourcePath = Bundle.module.bundleURL.path
+  // let config = try OracleConnection.Configuration(
+  //   host: env.get("REMOTE_DATABASE_HOST") ?? "adb.eu-frankfurt-1.oraclecloud.com",
+  //   port: env.get("REMOTE_DATABASE_PORT").flatMap(Int.init(_:)) ?? 1522,
+  //   service: .serviceName(env.get("REMOTE_DATABASE_SERVICE_NAME") ?? "service_low.adb.oraclecloud.com"),
+  //   username: env.get("REMOTE_DATABASE_USERNAME") ?? "ADMIN",
+  //   password: env.get("REMOTE_DATABASE_PASSWORD") ?? "Secr3t",
+  //   tls: .require(
+  //     .init(
+  //       configuration: .makeOracleWalletConfiguration(
+  //         wallet: "\(resourcePath)",
+  //         walletPassword: env.get("REMOTE_DATABASE_WALLET_PASSWORD") ?? "$ecr3t"
+  //       )
+  //     )
+  //   )
+  // )
 
-    /// Create the table in the database using the new `IF NOT EXISTS` keyword
+  let connection = try await OracleConnection.connect(configuration: config, id: 1, logger: logger)
+
+  /// Create the table in the database using the new `IF NOT EXISTS` keyword
+  do {
     try await connection.execute(
-        """
-             CREATE TABLE IF NOT EXISTS spatialparks (
-               id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
-               name VARCHAR2 (100),
-               address VARCHAR2 (100),
-               geometry SDO_GEOMETRY
-        )
-        """,
-        logger: logger)
+      """
+          CREATE TABLE IF NOT EXISTS spatial (
+            id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
+            coordinates SDO_GEOMETRY,
+            details JSON
+      )
+      """,
+      logger: logger
+    )
+  }
+  catch {
+    print(String(reflecting: error))
+  }
 
-    /// Close your connection once done
-    try await connection.close()
+  /// Close your connection once done
+  try await connection.close()
 
-    /// Create the client
-    let client = OracleClient(configuration: config, backgroundLogger: logger)
+  /// Create the Oracle client
+  let client = OracleClient(configuration: config, backgroundLogger: logger)
 
-    /// Controller
-    ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
+  /// Controller
+  ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
 
-    var app = Application(
-        router: router,
-        configuration: .init(
-            address: .hostname(arguments.hostname, port: arguments.port),
-            serverName: "spatial"),
-        logger: logger)
+  var app = Application(
+    router: router,
+    configuration: .init(
+      address: .hostname(arguments.hostname, port: arguments.port),
+      serverName: "spatial"
+    ),
+    logger: logger
+  )
 
-    if arguments.seed {
-        try await app.seedDatabase(app, config: config)
-    }
+  if arguments.seed {
+    try await app.seedDatabase(app, config: config)
+  }
 
-    app.addServices(client)
-    return app
+  app.addServices(client)
+  return app
 }
 
+/// Build router
 func buildRouter() -> Router<AppRequestContext> {
-    let router = Router(context: AppRequestContext.self)
+  let router = Router(context: AppRequestContext.self)
+  // Add middleware
+  router.addMiddleware {
+    // logging middleware
+    LogRequestsMiddleware(.info)
+  }
+  // Add default endpoint
+  router.get("/") { _, _ in
+    return "Hello!"
+  }
 
-    // Add middleware
-    router.addMiddleware {
-        // logging middleware
-        LogRequestsMiddleware(.info)
-    }
+  // Add /health route
+  router.get("/health") { _, _ -> HTTPResponse.Status in
+    .ok
+  }
 
-    // Add health endpoint
-    router.get("/health") { _, _ -> HTTPResponse.Status in
-        .ok
-    }
-    return router
+  return router
 }

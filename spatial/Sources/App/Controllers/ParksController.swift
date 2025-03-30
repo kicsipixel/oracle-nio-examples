@@ -4,175 +4,189 @@ import Logging
 import OracleNIO
 
 struct ParksController<Context: RequestContext> {
-    let client: OracleClient
-    let logger: Logger
+  let client: OracleClient
+  let logger: Logger
 
-    func addRoutes(to group: RouterGroup<Context>) {
-        group
-            .post(use: create)
-            .get(use: index)
-            .get(":id", use: show)
-            .post("filter", use: filter)
+  func addRoutes(to group: RouterGroup<Context>) {
+    group
+      .post(use: create)
+      .get(use: index)
+      .get(":id", use: show)
+      .patch(":id", use: update)
+      .delete(":id", use: delete)
+  }
+
+  // MARK: - create
+  /// Creates a new park with `coordinates` and `details`
+  @Sendable
+  func create(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
+    let park = try await request.decode(as: Park.self, context: context)
+
+    let detailsJSON = OracleJSON(park.details)
+
+    let query: OracleStatement = try "INSERT INTO spatial (coordinates, details) VALUES (SDO_GEOMETRY(\(park.coordinates.latitude), \(park.coordinates.longitude)), \(detailsJSON))"
+
+    _ = try await client.withConnection { conn in
+      try await conn.execute(query, logger: logger)
     }
 
-    // MARK: - create
+    return .created
+  }
 
-    /// Creates a new park with a `name`, `address` and `coordinates`
-    /// Usage: curl -X "POST" "http://localhost:8080/api/v1/parks" \
-    ///              -H 'Content-Type: application/json' \
-    ///              -d $'{
-    ///                     "name": "Test Park",
-    ///                     "address": "Test 17800 Praha Czech Republic",
-    ///                     "coordinates": {
-    ///                       "latitde": 50.50,
-    ///                       "longitude": "14.14"
-    ///                     }
-    ///         }'
-    @Sendable
-    func create(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
-        let park = try await request.decode(as: Park.self, context: context)
+  // MARK: - index
+  /// Returns with all parks in the database
+  /// Using optional Uri parameters to filter parks by distance from a given point
+  @Sendable
+  func index(_ request: Request, context: Context) async throws -> [Park] {
+    var query: OracleStatement?
+    var parks = [Park]()
 
-        _ = try await client.withConnection { conn in
-            try await conn.execute(
-                """
-                INSERT INTO spatialparks (
-                    name
-                    ,address
-                    ,geometry
-                    )
-                VALUES (
-                    \(park.name)
-                    ,\(park.address)
-                    ,SDO_GEOMETRY(\(park.coordinates.latitude), \(park.coordinates.longitude))
-                )
-                """,
-                logger: logger)
-        }
-        return .created
+    // Access query parameters
+    let queryParams = request.uri.queryParameters
+
+    if let userPosition = queryParams["latlong"], let distance = queryParams["distance"], let unit = queryParams["unit"] {
+      // Validate the user position
+      let coordinates = userPosition.components(separatedBy: ",")
+      guard coordinates.count == 2,
+        let latitude = Double(coordinates[0]),
+        let longitude = Double(coordinates[1])
+      else {
+        throw HTTPError(
+          .badRequest,
+          message: "Invalid position format. Please provide latitude and longitude separated by comma (e.g., latlong=50.14,14.49). Received: '\(userPosition)'"
+        )
+      }
+
+      // Validate the unit parameter
+      guard unit == "km" || unit == "mile" else {
+        throw HTTPError(.badRequest, message: "Invalid unit. Must be 'km' or 'mile'")
+      }
+
+      let distanceUnitString = "distance=\(distance) unit=\(unit)"
+
+      query = """
+        SELECT
+          id,
+           p.coordinates.SDO_POINT.X AS latitude,
+           p.coordinates.SDO_POINT.Y AS longitude,
+           p.details
+        FROM
+          spatial p
+        WHERE
+         SDO_WITHIN_DISTANCE(coordinates, SDO_GEOMETRY(\(latitude), \(longitude)), \(distanceUnitString)) = 'TRUE'
+        """
+    }
+    else {
+      query = """
+              SELECT
+                id,
+                 p.coordinates.SDO_POINT.X AS latitude,
+                 p.coordinates.SDO_POINT.Y AS longitude,
+                 p.details
+              FROM
+                spatial p
+        """
     }
 
-    // MARK: - index
-
-    /// List all parks in the database
-    /// Usage: 'curl http://localhost:8080/api/v1/parks/'
-    @Sendable
-    func index(_: Request, context _: Context) async throws -> [Park] {
-        var parks = [Park]()
-
-        try await client.withConnection { conn in
-            let rows = try await conn.execute(
-                """
-                SELECT
-                    p.id,
-                    p.name,
-                    p.address,
-                    p.geometry.SDO_POINT.X AS longitude,
-                    p.geometry.SDO_POINT.Y AS latitude
-                FROM
-                    spatialparks p
-                """)
-
-            for try await (id, name, address, latitude, longitude) in rows
-                .decode((UUID, String, String, Double, Double).self)
-            {
-                let park = Park(id: id,
-                                name: name,
-                                address: address,
-                                coordinates: Park.Coordinates(latitude: latitude,
-                                                              longitude: longitude))
-                parks.append(park)
-            }
-        }
-        return parks
+    guard let query = query else {
+      throw HTTPError(.badRequest, message: "Invalid query")
     }
 
-    // MARK: - show
-
-    /// Returns a single park with id
-    /// Usage: `curl "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285"`
-    @Sendable
-    func show(_: Request, context: Context) async throws -> Park? {
-        let id = try context.parameters.require("id", as: String.self)
-        let guid = id.replacingOccurrences(of: "-", with: "")
-
-        return try await client.withConnection { conn in
-            let rows = try await conn.execute(
-                """
-                SELECT
-                    p.id,
-                    p.name,
-                    p.address,
-                    p.geometry.SDO_POINT.X AS longitude,
-                    p.geometry.SDO_POINT.Y AS latitude
-                FROM
-                    spatialparks p
-                WHERE id = HEXTORAW(\(guid))
-                """,
-                logger: logger)
-
-            for try await (id, name, address, latitude, longitude) in rows
-                .decode((UUID, String, String, Double, Double).self)
-            {
-                return Park(id: id,
-                            name: name,
-                            address: address,
-                            coordinates: Park.Coordinates(latitude: latitude,
-                                                          longitude: longitude))
-            }
-            return nil
-        }
+    try await client.withConnection { conn in
+      let stream = try await conn.execute(query, logger: logger)
+      for try await (id, latitude, longitude, details) in stream.decode((UUID, Float, Float, OracleJSON<Park.Details>).self) {
+        parks.append(
+          .init(
+            id: id,
+            coordinates: Park.Coordinates.init(latitude: latitude, longitude: longitude),
+            details: Park.Details.init(name: details.value.name, address: details.value.address)
+          )
+        )
+      }
     }
+    return parks
+  }
 
-    // MARK: - filter
+  // MARK: - show
+  /// Returns a single park with id
+  @Sendable
+  func show(_ request: Request, context: Context) async throws -> Park? {
+    let id = try context.parameters.require("id", as: String.self)
+    let guid = id.replacingOccurrences(of: "-", with: "")
 
-    /// Search all parks withint the given distance
-    /// Usage: curl -X "POST" "http://localhost:8080/api/v1/parks/filter" \
-    ///              -H 'Content-Type: application/json' \
-    ///              -d $'{
-    ///                     "userPosition": {
-    ///                                       "longitude": 14.411944,
-    ///                                        "latitude": 50.086389
-    ///                      },
-    ///                     "distance": 0.27,
-    ///                     "unit": "mile"
-    ///         }'
-    @Sendable
-    func filter(_ request: Request, context: Context) async throws -> [Park] {
-        let filter = try await request.decode(as: Filter.self, context: context)
-        var parks = [Park]()
+    return try await client.withConnection { conn in
+      let stream = try await conn.execute(
+        """
+        SELECT
+          id,
+           p.coordinates.SDO_POINT.X AS latitude,
+           p.coordinates.SDO_POINT.Y AS longitude,
+           p.details
+        FROM
+          spatial p
+        WHERE id = HEXTORAW(\(guid))
+        """
+      )
 
-        try await client.withConnection { conn in
-            let distanceUnitString = "distance=\(filter.distance) unit=\(filter.unit)"
-            let query =
-                """
-                SELECT
-                  p.id,
-                  p.name,
-                  p.address,
-                  p.geometry.SDO_POINT.X AS longitude,
-                  p.geometry.SDO_POINT.Y AS latitude
-                FROM
-                  spatialparks p
-                WHERE
-                  SDO_WITHIN_DISTANCE(
-                    geometry,
-                    SDO_GEOMETRY(\(filter.userPosition.latitude),\(filter.userPosition.longitude)),
-                    '\(distanceUnitString)'
-                  ) = 'TRUE'
-                """
+      for try await (id, latitude, longitude, details) in stream.decode((UUID, Float, Float, OracleJSON<Park.Details>).self) {
+        return Park(
+          id: id,
+          coordinates: Park.Coordinates.init(latitude: latitude, longitude: longitude),
+          details: Park.Details.init(name: details.value.name, address: details.value.address)
+        )
+      }
 
-            let rows = try await conn.execute(OracleStatement(stringLiteral: query))
-
-            for try await (id, name, address, latitude, longitude) in rows
-                .decode((UUID, String, String, Double, Double).self)
-            {
-                let park = Park(id: id,
-                                name: name,
-                                address: address, coordinates: Park.Coordinates(latitude: latitude,
-                                                                                longitude: longitude))
-                parks.append(park)
-            }
-        }
-        return parks
+      return nil
     }
+  }
+
+  // MARK: - update
+  /// Updates a single park with id
+  @Sendable
+  func update(_ request: Request, context: Context) async throws -> HTTPResponse.Status {
+    let id = try context.parameters.require("id", as: String.self)
+    let guid = id.replacingOccurrences(of: "-", with: "")
+    let park = try await request.decode(as: Park.self, context: context)
+    let detailsJSON = OracleJSON(park.details)
+
+    let query: OracleStatement = try """
+    UPDATE spatial
+    SET coordinates = SDO_GEOMETRY(\(park.coordinates.latitude), \(park.coordinates.longitude)),
+        details = \(detailsJSON)
+    WHERE id = HEXTORAW(\(guid))
+    """
+
+    return try await client.withConnection { conn in
+      let stream = try await conn.execute(query, logger: logger)
+      let updatedRows = try await stream.affectedRows
+      if updatedRows == 0 {
+        return .notFound
+      }
+
+      return .ok
+    }
+  }
+
+  // MARK: - delete
+  /// Deletes park with id
+  @Sendable
+  func delete(_: Request, context: Context) async throws -> HTTPResponse.Status {
+    let id = try context.parameters.require("id", as: String.self)
+    let guid = id.replacingOccurrences(of: "-", with: "")
+
+    return try await client.withConnection { conn in
+      let stream = try await conn.execute(
+        """
+        DELETE FROM spatial
+        WHERE id = HEXTORAW(\(guid))
+        """,
+        logger: logger
+      )
+      let deletedRows = try await stream.affectedRows
+      if deletedRows == 0 {
+        return .notFound
+      }
+      return .noContent
+    }
+  }
 }

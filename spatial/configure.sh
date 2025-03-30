@@ -9,6 +9,12 @@ CLEAN_BASE_FOLDER=$(echo "$BASE_FOLDER" | sed -e 's/[^a-zA-Z0-9_]/_/g')
 TEMP_FOLDER=$(mktemp -d)
 MO="$TEMP_FOLDER"/mo
 
+if [ "$TARGET_FOLDER" = "$PWD/" ]; then
+    IN_PLACE_EDIT=true
+else
+    IN_PLACE_EDIT=false
+fi
+
 cleanup()
 {
     rm -rf "$TEMP_FOLDER"
@@ -31,12 +37,61 @@ read_input_with_default () {
     fi
 }
 
+yn_prompt () {
+    if [[ "$1" == "yes" ]]; then
+        echo "Y/n"
+    else
+        echo "y/N"
+    fi
+}
+
+read_yes_no () {
+    while [[ true ]]; do
+        echo -n "[$(yn_prompt $1)] > "
+        read -r READ_INPUT_RETURN
+
+        case "$READ_INPUT_RETURN" in
+            "y" | "Y")
+                READ_INPUT_RETURN="yes"
+                return
+                ;;
+
+            "n" | "N")
+                READ_INPUT_RETURN="no"
+                return
+                ;;
+
+            "")
+                READ_INPUT_RETURN="$1"
+                return
+                ;;
+
+            *)
+                echo "Please input either \"y\" or \"n\", or press ENTER to use the default."
+                ;;
+        esac
+    done
+}
+
 run_mustache()
 {
     FILES=$1
+    TEMP_FILE="$TEMP_FOLDER"/tempfile
     for FILE in $FILES; do 
-        $MO "$FILE" > "$TEMP_FOLDER"/tempfile
-        mv -f "$TEMP_FOLDER"/tempfile "$TARGET_FOLDER/$FILE"
+        $MO "$FILE" > "$TEMP_FILE"
+        # delete file if it is empty or only contains spaces
+        if ! grep -q '[^[:space:]]' "$TEMP_FILE" ; then
+            echo "Removing $FILE"
+            rm "$TEMP_FILE"
+            rm "$TARGET_FOLDER/$FILE"
+        else
+            if [ "$IN_PLACE_EDIT" = true ]; then
+                echo "Updating $FILE"
+            else
+                echo "Copying $FILE"
+            fi    
+            mv -f "$TEMP_FILE" "$TARGET_FOLDER/$FILE"
+        fi
     done
 }
 
@@ -58,17 +113,17 @@ echo "Configuring your Hummingbird project"
 # Download Bash Mustache
 download_mo
 
-if [[ "$TARGET_FOLDER" != "$PWD" ]]; then
+if [ "$IN_PLACE_EDIT" = false ]; then
     echo "Outputting to $TARGET_FOLDER"
     mkdir -p "$TARGET_FOLDER"/Sources/App
     mkdir -p "$TARGET_FOLDER"/Tests/AppTests
     mkdir -p "$TARGET_FOLDER"/.vscode
-    cp -r $TEMPLATE_FOLDER/.vscode/hummingbird.code-snippets $TARGET_FOLDER/.vscode
 else
     echo "Outputting to current folder"
 fi
 
-echo -n "Enter your package name: "
+echo ""
+echo -n "Enter your Swift package name: "
 read_input_with_default "$CLEAN_BASE_FOLDER"
 export HB_PACKAGE_NAME=$READ_INPUT_RETURN
 if [[ "$HB_PACKAGE_NAME" =~ [^a-zA-Z0-9_-] ]]; then
@@ -82,13 +137,21 @@ if [[ "$HB_EXECUTABLE_NAME" =~ [^a-zA-Z0-9_] ]]; then
     exitWithError "Invalid executable name: $HB_EXECUTABLE_NAME"
 fi
 
-pushd $TEMPLATE_FOLDER
+echo -n "Include Visual Studio Code snippets: "
+read_yes_no "yes"
+if [[ "$READ_INPUT_RETURN" == "yes" ]]; then
+    export HB_VSCODE_SNIPPETS="yes"
+fi
+
+echo ""
+
+pushd $TEMPLATE_FOLDER > /dev/null
 
 # Root level files
 FILES=$(find . -maxdepth 1 ! -type d ! -name "*.sh")
 run_mustache "$FILES"
 # Files in Sources and Tests folder
-FILES=$(find Sources Tests ! -type d)
+FILES=$(find Sources Tests .vscode/hummingbird.code-snippets ! -type d)
 run_mustache "$FILES"
 
 # README file
@@ -97,4 +160,11 @@ cat <<EOF | $MO > "$TARGET_FOLDER"/README.md
 Hummingbird server framework project
 EOF
 
-popd
+popd > /dev/null
+
+echo ""
+if [ "$IN_PLACE_EDIT" = true ]; then
+    echo "Run 'swift run' to build and run your server. Then open 'http://localhost:8080' in your web browser."
+else
+    echo "Enter the folder $TARGET_FOLDER and run 'swift run' to build and run your server. Then open 'http://localhost:8080' in your web browser."
+fi

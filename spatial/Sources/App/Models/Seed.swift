@@ -2,31 +2,35 @@ import Foundation
 import Hummingbird
 
 struct Seed: Codable, Sequence {
-    let features: [Feature]
+  let features: [Feature]
 
-    struct Feature: Codable {
-        let geometry: Geometry
-        let properties: Properties
-    }
+  // Feature
+  struct Feature: Codable {
+    let geometry: Geometry
+    let properties: Properties
+  }
 
-    func makeIterator() -> IndexingIterator<[Feature]> {
-        features.makeIterator()
-    }
-}
+  func makeIterator() -> IndexingIterator<[Feature]> {
+    features.makeIterator()
+  }
 
-struct Geometry: Codable {
+  // Geomtery
+  struct Geometry: Codable {
     let coordinates: [Double]
-}
+  }
 
-struct Properties: Codable {
+  // Properties
+  struct Properties: Codable {
     let address: Address
     let name: String
-}
+  }
 
-struct Address: Codable {
+  // Address
+  struct Address: Codable {
     let addressFormatted: String
 
     enum CodingKeys: String, CodingKey {
-        case addressFormatted = "address_formatted"
+      case addressFormatted = "address_formatted"
     }
+  }
 }
