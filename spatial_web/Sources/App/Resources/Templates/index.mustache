@@ -1,0 +1,58 @@
+{{<base}}
+{{$body}}
+<div id="map">
+    <div id="form-container"
+         class="flex items-center bg-gray-100 m-5 text-white box-border">
+        <form method="post"
+              action="/"
+              class="custom-form p-4"
+              onsubmit="saveSelections()">
+            <label for="options" class="block text-white mb-1">Choose your location:</label>
+            <select id="location"
+                    name="location"
+                    class="block w-full p-2 rounded bg-white text-black">
+                <option value="Karlův most">Karlův most</option>
+                <option value="Staroměstská">Staroměstská</option>
+                <option value="Náměstí Míru">Náměstí Míru</option>
+                <option value="Anděl">Anděl</option>
+            </select>
+            <label for="options" class="block text-white mt-2 mb-1">Choose distance:</label>
+            <select id="distance"
+                    name="distance"
+                    class="block w-full p-2 rounded bg-white text-black">
+                <option value="0.5">0.5</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+            </select>
+            <label for="options" class="block text-white mt-2 mb-1">Choose unit:</label>
+            <select id="unit"
+                    name="unit"
+                    class="block w-full p-2 rounded bg-white text-black">
+                <option value="km">km</option>
+                <option value="mile">mile</option>
+            </select>
+            <input type="submit"
+                   value="Filter"
+                   class="mt-4 w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-limegreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        </form>
+    </div>
+    <script src="/js/map.js"></script>
+    <script src="/js/helper.js"></script>
+    <script>
+    var annotationData = [];
+
+    {{#parks}}
+    annotationData.push({ name: "{{details.name}}", latitude: {{coordinates.latitude}}, longitude: {{coordinates.longitude}} });
+    {{/parks}}
+
+    const defaultLocation = {
+        latitude: {{location.latitude}},
+        longitude: {{location.longitude}}
+    };
+    
+    initializeMap(annotationData, defaultLocation);
+    </script>
+{{/body}}
+{{/base}}
