@@ -9,6 +9,12 @@ You can try it [here](https://spatial-web.fly.dev/).
   <img src="spatial-web-2.png" alt="Spatial Web 2" style="width: 48%;">
 </div>
 
+To make it easier, you can seed the database with some data from a `.json` file. 
+Simply run the application for the first time only with:
+```shell
+swift run App --seed
+```
+The database uses [`SDO_GEOMTERY`](https://docs.oracle.com/en/database/oracle/oracle-database/23/spatl/sdo_geometry-object-type.html) object type to to store coordinates. 
 
 ## Route is the following
 
