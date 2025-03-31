@@ -112,6 +112,10 @@ public func buildApplication(_ arguments: some AppArguments) async throws -> som
     logger: logger
   )
 
+  if arguments.seed {
+    try await app.seedDatabase(app, config: config)
+  }
+
   app.addServices(client)
   return app
 }
