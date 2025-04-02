@@ -1,0 +1,217 @@
+openapi: "3.1.0"
+info:
+  title: OpenAPI Generator with OracleNIO
+  description: Template server built on [Hummingbird](https://hummingbird.codes/) and [Swift OpenAPI Generator](https://github.com/apple/swift-openapi-generator).
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: This is the server.
+
+paths:
+  /health:
+    get:
+      summary: Server health status
+      description: Responses with 200 OK
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Server health status
+
+  /api/v1/pharmacies:
+    post:
+      summary: Create a new pharmacy
+      description: Adds a new pharmacy to the database
+      operationId: createPharmacy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pharmacy"
+      responses:
+        "201":
+          description: Pharmacy created successfully
+        "400":
+          description: Invalid input
+        "500":
+          description: Internal server error
+
+    get:
+      summary: Get list of pharmacies
+      description: Retrieves a list of all pharmacies
+      operationId: listPharmacies
+      parameters:
+        - name: latlong
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "50.14,14.57"
+          description: "The latitude and longitude to filter pharmacies"
+        - name: distance
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+            example: 10.00
+          description: "The range to filter pharmacies, in kilometers or miles"
+        - name: unit
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["km", "mile"]
+            example: "km"
+          description: "The unit of the range, either 'km' for kilometers or 'miles' for miles"
+      responses:
+        "200":
+          description: List of pharmacies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pharmacy"
+        "400":
+          description: Bad request
+        "500":
+          description: Internal server error
+
+  /api/v1/pharmacies/{id}:
+    get:
+      summary: Get pharmacy by ID
+      description: Retrieves a pharmacy by its ID
+      operationId: getPharmacyById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the pharmacy to retrieve
+      responses:
+        "200":
+          description: Pharmacy found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pharmacy"
+        "404":
+          description: Pharmacy not found
+        "500":
+          description: Internal server error
+
+    put:
+      summary: Update pharmacy by ID
+      description: Updates a pharmacy's information
+      operationId: updatePharmacyById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the pharmacy to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Pharmacy"
+      responses:
+        "200":
+          description: Pharmacy updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pharmacy"
+        "400":
+          description: Invalid input
+        "404":
+          description: Pharmacy not found
+        "500":
+          description: Internal server error
+
+    delete:
+      summary: Delete pharmacy by ID
+      description: Deletes a pharmacy from the database
+      operationId: deletePharmacyById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the pharmacy to delete
+      responses:
+        "204":
+          description: Pharmacy deleted successfully
+        "404":
+          description: Pharmacy not found
+        "500":
+          description: Internal server error
+
+components:
+  schemas:
+    Pharmacy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: double
+            longitude:
+              type: number
+              format: double
+        address:
+          type: object
+          properties:
+            city:
+              type: string
+            street:
+              type: string
+            zip:
+              type: string
+        web:
+          type: array
+          items:
+            type: string
+        email:
+          type: array
+          items:
+            type: string
+        phone:
+          type: array
+          items:
+            type: string
+        openinghours:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpeningHour"
+        isopensat:
+          type: boolean
+        isopensun:
+          type: boolean
+        isopenpublicholiday:
+          type: boolean
+    OpeningHour:
+      type: object
+      properties:
+        day_of_week:
+          type: string
+        opens:
+          type: string
+        closes:
+          type: string
