@@ -1,6 +1,6 @@
-# Example to use JSON natively with JSON data type with ADB in OCI
+# Example to use JSON natively with JSON data type
 
-This example demonstrates how to natively write, read, and query JSON data using Oracle Database 23ai as an [Autonomous Database](https://www.oracle.com/autonomous-database/) in Oracle Cloud Infrastructure (OCI).
+This example demonstrates how to natively write, read, and query JSON data using Oracle Database 23ai.
 
 The sample data (included in the repo) :
 ```json
@@ -31,23 +31,6 @@ The sample data (included in the repo) :
 }
 ```
 ## Preparation
-### Step 1.
-Download wallet for mTLS connection, and copy the `Connection string`.
-![](ADB.png)
-
-### Step 2.
-Create a .env file and add the credentials:
-```
-DATABASE_HOST=adb.eu-frankfurt-1.oraclecloud.com
-DATABASE_PORT=1522
-DATABASE_SERVICE_NAME=gdb965aee735fa8_szabolcstothdb_low.adb.oraclecloud.com
-DATABASE_USERNAME=ADMIN
-DATABASE_PASSWORD=
-# Wallet folder should be in /Sources/App/Resources foler unzipped
-DATABASE_WALLET_PASSWORD=
-```
-
-### Step 3.
 
 To make it easier, you can seed the database with some data from a `.json` file. 
 Simply run the application for the first time only with:
@@ -62,23 +45,43 @@ Data stored in database:
 
 ## Routes are as follows
 
+- __GET__: / - Return with simple "Hello!"
 - __GET__: /health - Checks server health status
-- __GET__: /api/v1/people- Lists all the people in the database
-- __GET__: /api/v1/people/:id - Show a single person with id
-- __POST__: /api/v1/people/filter - Returns the list of people which comply to the filter
+- __GET__: /api/v1/people - Lists all the people in the database
+- __GET__: /api/v1/people/:id - Shows a single person with id
+- __POST__: /api/v1/people/- Creates new person in the database
+- __PUT__: /api/v1/people/:id - Edits the person in the database with given id
+- __POST__: /api/v1/people/:id - Deletes the person from database with given id
+
+### 👋 Hello
+Simple endpoint returns with "Hello!".
+
+- __URL:__ http://localhost:8080
+- __HTTPMethod:__ `GET`
+
+```
+$ curl -i http://localhost:8080
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Content-Length: 6
+Date: Sat, 05 Apr 2025 18:42:14 GMT
+Server: json
+
+Hello!
+```
 
 ### 🩺 Health
-Simple endpoint to check whether the server is alive, giving back `200 OK`
+Simple endpoint to check whether the server is alive, giving back `200 OK`.
 
 - __URL:__ http://localhost:8080/health
 - __HTTPMethod:__ `GET`
 
 ```
-curl -i http://localhost:8080/health
+$ curl -i http://localhost:8080/health
 HTTP/1.1 200 OK
 Content-Length: 0
-Date: Thu, 12 Sep 2024 12:22:32 GMT
-Server: spatial
+Date: Sat, 05 Apr 2025 18:44:27 GMT
+Server: json
 ```
 
 ### {  } JSON API
@@ -88,16 +91,17 @@ Server: spatial
 - __HTTPMethod:__ `GET`
 
 ```
-curl "http://localhost:8080/api/v1/people"
+$ curl "http://localhost:8080/api/v1/people"
 ```
 
 __Return value:__
 An array of
 - `id`:  person UUID
-- `nat`: nationality
-- `email`: email address
-- `hobbies`: array of hobbies
-- `name` 
+- `details`: 
+  - `nat`: nationality
+  - `email`: email address
+  - `hobbies`: array of hobbies
+  - `name` 
     - `title`: title
     - `first`: first name
     - `last`: last name
@@ -105,170 +109,242 @@ An array of
 ```json
 [
   {
-    "id": "6C22EEE1-B2B3-42AA-B404-CF64C1595612",
-    "nat": "DE",
-    "email": "lilian.kindler@example.com",
-    "hobbies": [
-      "karate",
-      "running",
-      "movies"
-    ],
-    "name": {
-      "first": "Lilian",
-      "title": "Ms",
-      "last": "Kindler"
+    "id": "32AACC67-B1F5-4DE6-84E0-C7A9285BE618",
+    "details": {
+      "nationality": "DE",
+      "hobbies": [
+        "reading"
+      ],
+      "name": {
+        "last": "Strecker",
+        "first": "Thoralf",
+        "title": "Mr"
+      },
+      "email": "thoralf.strecker@example.com"
     }
   },
   {
-    "id": "FC2BF354-A721-4471-9F77-5E195896BCF1",
-    "name": {
-      "last": "Strecker",
-      "title": "Mr",
-      "first": "Thoralf"
-    },
-    "hobbies": [
-      "reading"
-    ],
-    "nat": "DE",
-    "email": "thoralf.strecker@example.com"
+    "id": "A7A452B6-90B1-415D-A1D5-468EC4E85C19",
+    "details": {
+      "name": {
+        "last": "Ferguson",
+        "title": "Miss",
+        "first": "Yvonne"
+      },
+      "hobbies": [
+        "swimming",
+        "hiking"
+      ],
+      "nationality": "US",
+      "email": "yvonne.ferguson@example.com"
+    }
   },
   ...
 ]
 ```
 
-#### Show a single person with id
+#### Shows a single person with id
 
 - __URL:__ http://localhost:8080/api/v1/people/:id
 - __HTTPMethod:__ `GET`
 
 ```
-curl "http://localhost:8080/api/v1/people/6C22EEE1-B2B3-42AA-B404-CF64C1595612"
+$ curl "http://localhost:8080/api/v1/people/6C22EEE1-B2B3-42AA-B404-CF64C1595612"
 ```
 
 __Return value:__
 - `id`:  person UUID
-- `nat`: nationality
-- `email`: email address
-- `hobbies`: array of hobbies
-- `name` 
-    - `title`: title
-    - `first`: first name
-    - `last`: last name
+- `details`:
+  - `nat`: nationality
+  - `email`: email address
+  - `hobbies`: array of hobbies
+  - `name` 
+      - `title`: title
+      - `first`: first name
+      - `last`: last name
 
 ```json
 {
-  "email": "lilian.kindler@example.com",
-  "name": {
-    "first": "Lilian",
-    "last": "Kindler",
-    "title": "Ms"
-  },
-  "nat": "DE",
-  "id": "6C22EEE1-B2B3-42AA-B404-CF64C1595612",
-  "hobbies": [
-    "karate",
-    "running",
-    "movies"
-  ]
+  "id": "A7A452B6-90B1-415D-A1D5-468EC4E85C19",
+  "details": {
+    "name": {
+      "last": "Ferguson",
+      "title": "Miss",
+      "first": "Yvonne"
+    },
+    "hobbies": [
+      "swimming",
+      "hiking"
+    ],
+    "nationality": "US",
+    "email": "yvonne.ferguson@example.com"
+  }
 }
 ```
 
 #### Returns the list of people which comply to the filter
 
 - __URL:__ http://localhost:8080/api/v1/people/filter
-- __HTTPMethod:__ `POST`
+- __HTTPMethod:__ `GET`
 
 ```
-curl -X "POST" "http://localhost:8080/api/v1/people/filter" \
-     -H 'Content-Type: application/json' \
-     -d $'{
-  "query": [
-    {
-      "operator": "AND",
-      "conditions": [
-        {
-          "key": "hobbies",
-          "value": "running"
-        },
-        {
-          "key": "nat",
-          "value": "NL"
-        },
-        {
-          "key": "hobbies",
-          "value": "movies"
-        }
-      ]
-    }
-  ]
-}'
+$ curl "http://localhost:8080/api/v1/people?nat=DE&hobbies=reading"
 ```
 This will generate the following PL/SQL query:
 ```sql
 SELECT
-    *
+    id,
+    people_list
 FROM
     people
 WHERE
-    JSON_EXISTS ( people_list, '$.hobbies[*]?(@ == "running")' )
-    AND JSON_VALUE(people_list, '$.nat') = 'NL'
-    AND JSON_EXISTS ( people_list, '$.hobbies[*]?(@ == "movies")' );
+    JSON_EXISTS ( people_list, '$.hobbies[*]?(@ == "reading")' )
+    AND JSON_VALUE(people_list, '$.nat') = 'NL';
 ```
 
 __Return value:__
 An array of
 - `id`:  person UUID
-- `nat`: nationality
-- `email`: email address
-- `hobbies`: array of hobbies
-- `name` 
-    - `title`: title
-    - `first`: first name
-    - `last`: last name
+- `details`:
+  - `nat`: nationality
+  - `email`: email address
+  - `hobbies`: array of hobbies
+  - `name` 
+      - `title`: title
+      - `first`: first name
+      - `last`: last name
 
 ```json
 [
   {
-    "hobbies": [
-      "running",
-      "movies"
-    ],
-    "nat": "NL",
-    "id": "6C9842AA-BC35-4599-8B9A-7BA26FFE0FA2",
-    "name": {
-      "first": "Vivienne",
-      "title": "Mrs",
-      "last": "Mariën"
-    },
-    "email": "vivienne.marien@example.com"
-  },
-  {
-    "id": "7473F550-6A67-435E-B77D-CCCE9C9B4D6F",
-    "email": "ouail.geels@example.com",
-    "nat": "NL",
-    "hobbies": [
-      "running",
-      "movies"
-    ],
-    "name": {
-      "last": "Geels",
-      "title": "Mr",
-      "first": "Ouaïl"
+    "id": "9F9DF92B-9C61-490E-8FB3-2ADCE3132DD1",
+    "details": {
+      "nationality": "NL",
+      "hobbies": [
+        "movies",
+        "reading",
+        "swimming",
+        "hiking",
+        "cooking"
+      ],
+      "email": "bea.deboom@example.com",
+      "name": {
+        "last": "De Boom",
+        "first": "Bea",
+        "title": "Ms"
+      }
     }
   },
   {
-    "id": "51657F4E-1331-4147-ADD5-4496B0065471",
-    "nat": "NL",
-    "email": "mimoun.vellema@example.com",
-    "name": {
-      "title": "Mr",
-      "first": "Mimoun",
-      "last": "Vellema"
-    },
-    "hobbies": [
-      "running",
-      "movies"
-    ]
+    "id": "9D1CA4CF-8B48-40BB-A494-1B15E801B92C",
+    "details": {
+      "name": {
+        "first": "Raynor",
+        "title": "Mr",
+        "last": "Felter"
+      },
+      "email": "raynor.felter@example.com",
+      "nationality": "NL",
+      "hobbies": [
+        "reading",
+        "swimming",
+        "hiking",
+        "cooking",
+        "gardening"
+      ]
+    }
+  },
+  {
+    "id": "3C1AFFC1-7A5B-477B-90CD-8F3BD62E6D1F",
+    "details": {
+      "hobbies": [
+        "reading",
+        "swimming",
+        "hiking",
+        "cooking",
+        "gardening"
+      ],
+      "name": {
+        "first": "Eke",
+        "last": "Van der Gaast",
+        "title": "Ms"
+      },
+      "email": "eke.vandergaast@example.com",
+      "nationality": "NL"
+    }
   }
 ]
 ```
+
+#### Creates a single person with id
+
+- __URL:__ http://localhost:8080/api/v1/people/
+- __HTTPMethod:__ `POST`
+
+```
+$ curl -X "POST" "http://localhost:8080/api/v1/people" \
+     -H 'Content-Type: application/json' \
+     -d $'{
+  "details": {
+    "email": "lilian.kindler@example.com",
+    "hobbies": [
+      "karate",
+      "running",
+      "movies"
+    ],
+    "nationality": "DE",
+    "name": {
+      "first": "Lilian",
+      "title": "Ms",
+      "last": "Kindler"
+    }
+  }
+}'
+```
+
+__Return value:__
+
+`201 Created`
+
+#### Edits the person with id
+
+- __URL:__ http://localhost:8080/api/v1/people/:id
+- __HTTPMethod:__ `PUT`
+
+```
+$ curl -X "PUT" "http://localhost:8080/api/v1/people/BFDA1A91-1681-4703-8DC3-E22876EF346A" \
+     -H 'Content-Type: application/json' \
+     -d $'{
+  "details": {
+    "email": "lilian.kindler@example.com",
+    "hobbies": [
+      "karate",
+      "running",
+      "movies"
+    ],
+    "nationality": "NL",
+    "name": {
+      "first": "Lilian",
+      "title": "Ms",
+      "last": "Kindler"
+    }
+  }
+}'
+```
+
+__Return value:__
+
+`200 OK`
+
+#### Deletes the person with id
+
+- __URL:__ http://localhost:8080/api/v1/people/:id
+- __HTTPMethod:__ `DELETE`
+
+```
+$ curl -X "DELETE" "http://localhost:8080/api/v1/people/BFDA1A91-1681-4703-8DC3-E22876EF346A"
+```
+
+__Return value:__
+
+`204 No content`

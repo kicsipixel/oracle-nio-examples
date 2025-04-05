@@ -1,17 +1,16 @@
 import Foundation
 import Hummingbird
 
-struct Person: Codable {
-    let id: UUID
+struct Person {
+  let id: UUID?
+  let details: Details
+
+  struct Details: Codable {
     let name: Name
     let email: String
     let nationality: String
     let hobbies: [String]
-    
-    enum CodingKeys: String, CodingKey {
-        case id, name, email, hobbies
-        case nationality = "nat"
-    }
+  }
 }
 
-extension Person: ResponseCodable { }
+extension Person: ResponseCodable {}

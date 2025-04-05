@@ -7,7 +7,7 @@ struct Filter: Codable {
 struct Query: Codable {
   let conditions: [Condition]
   let queryOperator: String
-  
+
   enum CodingKeys: String, CodingKey {
     case conditions
     case queryOperator = "operator"
