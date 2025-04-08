@@ -6,3 +6,4 @@
 /*.xcodeproj
 xcuserdata/
 /.vscode/*
+!/.vscode/hummingbird.code-snippets

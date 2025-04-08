@@ -1,4 +1,4 @@
 generate:
-- types
-- server
+  - types
+  - server
 accessModifier: public

@@ -9,7 +9,7 @@ servers:
     description: This is the server.
 
 paths:
-  # Health 
+  # Health
   # curl -i http://localhost:8080/health
   #
   /health:
@@ -27,7 +27,7 @@ paths:
   /:
     get:
       summary: Greetings
-      description: Responses with a simple string using emoji. Hello, World! 🌍 
+      description: Responses with a simple string using emoji. Hello, World! 🌍
       operationId: hello
       responses:
         "200":
@@ -54,18 +54,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Park"
-  
-  # Create
-  # curl -X "POST" "http://localhost:8080/api/v1/parks" \
-  #      -H 'Content-Type: application/json' \
-  #      -d $'{
-  #    "name": "Stromovka",
-  #    "coordinates": {
-  #      "longitude": 14.413999,
-  #      "latitude": 50.105849
-  #    }
-  #  }'
-  #
+
+    # Create
+    # curl -X "POST" "http://localhost:8080/api/v1/parks" \
+    #      -H 'Content-Type: application/json' \
+    #      -d $'{
+    #    "name": "Stromovka",
+    #    "coordinates": {
+    #      "longitude": 14.413999,
+    #      "latitude": 50.105849
+    #    }
+    #  }'
+    #
     post:
       summary: Create a park
       description: Saves park to the database
@@ -111,20 +111,20 @@ paths:
           description: Park not found
         "500":
           description: Internal server error
-  
-  # Update
-  # curl -X "PUT" "http://localhost:8080/api/v1/parks/2408B278-1518-DB79-E063-485D000A4B80" \
-  #      -H 'Content-Type: application/json' \
-  #      -d $'{
-  #    "name": "Stromovka",
-  #    "coordinates": {
-  #      "longitude": 14.413999,
-  #      "latitude": 50.105849
-  #    }
-  #  }'
-  #
+
+    # Update
+    # curl -X "PUT" "http://localhost:8080/api/v1/parks/2408B278-1518-DB79-E063-485D000A4B80" \
+    #      -H 'Content-Type: application/json' \
+    #      -d $'{
+    #    "name": "Stromovka",
+    #    "coordinates": {
+    #      "longitude": 14.413999,
+    #      "latitude": 50.105849
+    #    }
+    #  }'
+    #
     put:
-      summary: Update 
+      summary: Update
       description: Updates park with specified id
       operationId: updatePark
       parameters:
@@ -149,14 +149,14 @@ paths:
           description: Park not found
         "500":
           description: Internal server error
-  
-  # Delete
-  # curl -X "DELETE" "http://localhost:8080/api/v1/parks/2412D31E-B8F0-57E3-E063-485D000A41DC" \
-  #   -H 'Content-Type: application/json'
-  #
+
+    # Delete
+    # curl -X "DELETE" "http://localhost:8080/api/v1/parks/2412D31E-B8F0-57E3-E063-485D000A41DC" \
+    #   -H 'Content-Type: application/json'
+    #
     delete:
       summary: Delete
-      description: Deletes park with specified id 
+      description: Deletes park with specified id
       operationId: deletePark
       parameters:
         - in: path
@@ -166,7 +166,7 @@ paths:
             type: string
             format: uuid
       responses:
-        "200":
+        "204":
           description: Park deleted successfully
         "404":
           description: Park not found

@@ -1,27 +1,12 @@
-# Example to use Swift OpenAPI Generator with OracleNIO and ADB in OCI
+# Example to use Swift OpenAPI Generator with OracleNIO
 
-This example demonstrates how to use [Swift OpenAPI Generator](https://github.com/apple/swift-openapi-generator) using [OracleNIO](https://github.com/lovetodream/oracle-nio) with Oracle Database 23ai as an Autonomous Database in Oracle Cloud Infrastructure (OCI).
+This example demonstrates how to use [Swift OpenAPI Generator](https://github.com/apple/swift-openapi-generator) using [OracleNIO](https://github.com/lovetodream/oracle-nio) with Oracle Database 23ai.
 
 Special thanks to:
 - Babeth Velghe for her [Stop Worrying About Routes With OpenAPI Generator](https://www.youtube.com/watch?v=n1PRYVveLd0) presentation and
 - [Joannis](https://github.com/Joannis) for his [Using OpenAPI Generator with Hummingbird](https://swiftonserver.com/using-openapi-with-hummingbird/) article.
 
-## Preparation
-### Step 1.
-Download wallet for mTLS connection, and copy the `Connection string`.
-![](https://github.com/kicsipixel/oracle-nio-examples/blob/main/json/ADB.png)
 
-### Step 2.
-Create a .env file and add the credentials:
-```
-DATABASE_HOST=adb.eu-frankfurt-1.oraclecloud.com
-DATABASE_PORT=1522
-DATABASE_SERVICE_NAME=gdb965aee735fa8_szabolcstothdb_low.adb.oraclecloud.com
-DATABASE_USERNAME=ADMIN
-DATABASE_PASSWORD=
-# Wallet folder should be in /Sources/App/Resources foler unzipped
-DATABASE_WALLET_PASSWORD=
-```
 ## Routes are as follows
 
 - __GET__: /health - Checks server health status
@@ -63,7 +48,7 @@ curl -X "POST" "http://localhost:8080/api/v1/parks" \
 ```
 
 __Return value:__
-- `201 CREATED`
+- `201 Created`
 
 
 #### Lists all the parks in the database
@@ -154,4 +139,4 @@ curl -X "DELETE" "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020
 ```
 
 __Return value:__
-- `200 OK`
+- `204 No Content`
