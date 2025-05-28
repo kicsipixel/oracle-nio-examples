@@ -1,6 +1,6 @@
 # Basic CRUD operations using Oracle database
 
-Example of app using [OracleNIO](https://github.com/lovetodream/oracle-nio/tree/main) to connect to Oracle database. It creates a table, then user can add new entries, read, update or delete them as well.
+Example app using [OracleNIO](https://github.com/lovetodream/oracle-nio/tree/main) to connect to Oracle database. It creates a table, then user can add new entries, read, update or delete them as well.
 
 ## Routes are as follows
 
