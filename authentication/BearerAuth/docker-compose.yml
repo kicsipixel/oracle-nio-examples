@@ -1,0 +1,27 @@
+services:
+  database:
+    image: container-registry.oracle.com/database/free:latest-lite
+    env_file:
+      - .env
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    ports:
+      - '1521:1521'
+
+  app:
+    image: parksofprague:latest
+    build:
+      context: .
+    env_file:
+      - .env
+    depends_on:
+      - database
+    ports:
+      - '8080:8080'
+    command: ["--hostname", "0.0.0.0", "--port", "8080"]
+
+volumes:
+  oracle_data:
+    driver: local
+
+
