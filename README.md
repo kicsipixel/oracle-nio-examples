@@ -36,3 +36,4 @@ REMOTE_DATABASE_WALLET_PASSWORD=myWall3tPassw0rd
 - [json](https://github.com/kicsipixel/oracle-nio-examples/tree/main/json) - Example to use JSON natively with JSON data type with ADB in OCI
 - [openapi](https://github.com/kicsipixel/oracle-nio-examples/tree/main/openapi) - Example to use Swift OpenAPI Generator with OracleNIO and ADB in OCI
 - [openapi + spatial](https://github.com/kicsipixel/oracle-nio-examples/tree/main/Pharmacies) - Unlocking the new features of Oracle Database 23ai with Swift on Server
+- [authentication](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication) - Bearer Authentication using OracleNIO
