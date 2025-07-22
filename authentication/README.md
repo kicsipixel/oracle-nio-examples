@@ -5,4 +5,4 @@ Source code for the [tutorial](https://medium.com/@kicsipixel/bearer-authenticat
 
 - Basic Auth [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/BasicAuth)
 - Bearer Authentication [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/BearerAuth)
-- Reset Password [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/ResetPassword)
+- Reset Password [tutorial](https://medium.com/@kicsipixel/password-reset-with-bearer-authentication-9e33cd66ace5) [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/ResetPassword)
