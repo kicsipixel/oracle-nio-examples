@@ -216,7 +216,7 @@ struct ParksController<Context: RequestContext> {
     let guid = id.replacingOccurrences(of: "-", with: "")
 
     // Get the enrty
-    let _ = try await client.withConnection { conn in
+    _ = try await client.withConnection { conn in
       let stream = try await conn.execute(
         """
         SELECT
