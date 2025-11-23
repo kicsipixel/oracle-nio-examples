@@ -80,6 +80,9 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
 
   let client = OracleClient(configuration: config, backgroundLogger: logger)
 
+  // MARK: - Controllers
+  ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
+
   var app = Application(
     router: router,
     configuration: .init(
