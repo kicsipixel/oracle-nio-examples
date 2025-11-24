@@ -14,6 +14,9 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.6.2"),
     // Database dependencies
     .package(url: "https://github.com/lovetodream/oracle-nio.git", branch: "main"),
+    // Authentication
+    .package(url: "https://github.com/hummingbird-project/hummingbird-auth.git", from: "2.1.0"),
+    .package(url: "https://github.com/vapor/jwt-kit.git", from: "5.3.0"),
   ],
   targets: [
     .executableTarget(
@@ -23,6 +26,11 @@ let package = Package(
         .product(name: "Hummingbird", package: "hummingbird"),
         // Database dependencies
         .product(name: "OracleNIO", package: "oracle-nio"),
+        // Authentication
+        .product(name: "HummingbirdBcrypt", package: "hummingbird-auth"),
+        .product(name: "HummingbirdAuth", package: "hummingbird-auth"),
+        .product(name: "HummingbirdBasicAuth", package: "hummingbird-auth"),
+        .product(name: "JWTKit", package: "jwt-kit"),
       ],
       path: "Sources/App",
       resources: [.process("Credentials")]

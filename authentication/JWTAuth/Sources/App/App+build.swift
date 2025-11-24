@@ -1,5 +1,7 @@
 import Foundation
 import Hummingbird
+import HummingbirdAuth
+import JWTKit
 import Logging
 import OracleNIO
 
@@ -14,7 +16,7 @@ package protocol AppArguments {
 }
 
 // Request context used by application
-typealias AppRequestContext = BasicRequestContext
+typealias AppRequestContext = BasicAuthRequestContext<User>
 
 ///  Build application
 /// - Parameter arguments: application arguments
@@ -58,7 +60,7 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
 
   let connection = try await OracleConnection.connect(configuration: config, id: 1, logger: logger)
 
-  /// Create the table in the database using the new `IF NOT EXISTS` keyword
+  /// Create the tables in the database using the new `IF NOT EXISTS` keyword
   do {
     try await connection.execute(
       """
@@ -75,13 +77,45 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
     print(String(reflecting: error))
   }
 
+  do {
+    try await connection.execute(
+      """
+          CREATE TABLE IF NOT EXISTS users (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          name VARCHAR2(100) NOT NULL,
+          email VARCHAR2(100) NOT NULL,
+          password VARCHAR2(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+      """,
+      logger: logger
+    )
+  }
+  catch {
+    print(String(reflecting: error))
+  }
+
   /// Close your connection once done
   try await connection.close()
 
   let client = OracleClient(configuration: config, backgroundLogger: logger)
 
+  // MARK: JWT configuration
+  // Create JWT Key collection and add key for signing JWTs
+  let jwtKeyCollection = JWTKeyCollection()
+  guard let jwtKey = env.get("JWTKEY") else {
+    // No JWT Key no party
+    fatalError("Missing JWT Key in environment variables")
+  }
+  await jwtKeyCollection.add(
+    hmac: .init(stringLiteral: jwtKey),
+    digestAlgorithm: .sha256,
+    kid: JWKIdentifier("auth-jwt")
+  )
+
   // MARK: - Controllers
   ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
+  UsersController(client: client, logger: logger).addRoutes(to: router.group("api/v1/users"))
 
   var app = Application(
     router: router,
