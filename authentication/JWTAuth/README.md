@@ -215,8 +215,7 @@ $ curl -X "POST" "http://localhost:8080/api/v1/users/login" \
 ```
 
 __Return value:__
-- `userId`:  user UUID
-- `tokenValue`: Bearer token
+- `token`: JW token
 
 ```
 {
