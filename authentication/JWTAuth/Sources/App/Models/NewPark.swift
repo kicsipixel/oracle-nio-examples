@@ -1,11 +1,10 @@
 import Foundation
 import Hummingbird
 
-struct Park {
+struct NewPark {
   let id: UUID?
   let coordinates: Coordinates
   let details: Details
-  let userId: UUID
 
   struct Coordinates: Codable {
     let latitude: Float
@@ -17,4 +16,4 @@ struct Park {
   }
 }
 
-extension Park: ResponseCodable {}
+extension NewPark: ResponseCodable {}

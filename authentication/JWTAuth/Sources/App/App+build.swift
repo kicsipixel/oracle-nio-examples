@@ -64,10 +64,12 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
   do {
     try await connection.execute(
       """
-          CREATE TABLE IF NOT EXISTS parks (
-            id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
-            coordinates SDO_GEOMETRY,
-            details JSON
+          CREATE TABLE IF NOT EXISTS users (
+          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+          name VARCHAR2(100) NOT NULL,
+          email VARCHAR2(100) NOT NULL,
+          password VARCHAR2(255) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
       """,
       logger: logger
@@ -80,12 +82,13 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
   do {
     try await connection.execute(
       """
-          CREATE TABLE IF NOT EXISTS users (
-          id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
-          name VARCHAR2(100) NOT NULL,
-          email VARCHAR2(100) NOT NULL,
-          password VARCHAR2(255) NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          CREATE TABLE IF NOT EXISTS parks (
+            id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
+            coordinates SDO_GEOMETRY,
+            details JSON,
+            user_id RAW(16) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          CONSTRAINT fk_park_user FOREIGN KEY (user_id) REFERENCES users(id)
       )
       """,
       logger: logger
@@ -114,8 +117,8 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
   )
 
   // MARK: - Controllers
-  ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
-  UsersController(client: client, logger: logger).addRoutes(to: router.group("api/v1/users"))
+  ParksController(client: client, logger: logger, jwtKeyCollection: jwtKeyCollection, kid: JWKIdentifier("auth-jwt")).addRoutes(to: router.group("api/v1/parks"))
+  UsersController(client: client, logger: logger, jwtKeyCollection: jwtKeyCollection, kid: JWKIdentifier("auth-jwt")).addRoutes(to: router.group("api/v1/users"))
 
   var app = Application(
     router: router,
