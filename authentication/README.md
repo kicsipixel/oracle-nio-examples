@@ -9,6 +9,6 @@ Source code for the [tutorial](https://medium.com/@kicsipixel/bearer-authenticat
 
 ## JWT Token based authentication with Hummingbird 2
 
-Source code for the [tutorial]()
+Source code for the [tutorial](https://medium.com/@kicsipixel/jwt-authentication-using-oraclenio-8870a62b023a)
 
 - JWTAuth [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/JWTAuth)
