@@ -32,7 +32,7 @@ REMOTE_DATABASE_WALLET_PASSWORD=myWall3tPassw0rd
 ## Examples
 - [simple-crud](https://github.com/kicsipixel/oracle-nio-examples/tree/main/simple_crud) - Simple application to demonstrate CRUD operations
 - [spatial](https://github.com/kicsipixel/oracle-nio-examples/tree/main/spatial) - Example to use SDO_GEOMETRY for location analysis
-- [spatial-web](https://github.com/kicsipixel/oracle-nio-examples/tree/main/spatial-web) - Example to use SDO_GEOMETRY for location analysis, showing result on map using [MapKit JS](https://developer.apple.com/maps/web/)
+- [spatial-web](https://github.com/kicsipixel/oracle-nio-examples/tree/main/spatial_web) - Example to use SDO_GEOMETRY for location analysis, showing result on map using [MapKit JS](https://developer.apple.com/maps/web/)
 - [json](https://github.com/kicsipixel/oracle-nio-examples/tree/main/json) - Example to use JSON natively with JSON data type with ADB in OCI
 - [openapi](https://github.com/kicsipixel/oracle-nio-examples/tree/main/openapi) - Example to use Swift OpenAPI Generator with OracleNIO and ADB in OCI
 - [openapi + spatial](https://github.com/kicsipixel/oracle-nio-examples/tree/main/Pharmacies) - Unlocking the new features of Oracle Database 23ai with Swift on Server
