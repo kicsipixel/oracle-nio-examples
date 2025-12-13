@@ -1,5 +1,6 @@
 import Foundation
 import Hummingbird
+import HummingbirdAuth
 import Logging
 import Mustache
 import OracleNIO
@@ -69,6 +70,7 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
                   id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
                   coordinates SDO_GEOMETRY,
                   details JSON,
+                  user_id VARCHAR2(64),
                   created_at    DATE DEFAULT CURRENT_TIMESTAMP,
                   modified_at   DATE
                 )
@@ -82,14 +84,15 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
     try await connection.close()
 
     let client = OracleClient(configuration: config, backgroundLogger: logger)
-
+    let oauthService = try await OAuthService()
+    
     // MARK: - Mustache
     let library = try await MustacheLibrary(directory: Bundle.module.bundleURL.path)
     assert(library.getTemplate(named: "base") != nil)
 
     // MARK: - Controllers
     ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
-    WebpagesController(client: client, mustacheLibrary: library).addRoutes(to: router.group("/"))
+    WebpagesController(client: client, mustacheLibrary: library, oauthService: oauthService, logger: logger).addRoutes(to: router.group("/"))
 
     var app = Application(
         router: router,
@@ -104,13 +107,14 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
 }
 
 /// Build router
-func buildRouter() throws -> Router<AppRequestContext> {
-    let router = Router(context: AppRequestContext.self)
+func buildRouter() throws -> Router<AuthRequestContext> {
+    let router = Router(context: AuthRequestContext.self)
     // Add middleware
     router.addMiddleware {
-        // logging middleware
         LogRequestsMiddleware(.info)
         FileMiddleware()
+        CORSMiddleware()
+        SessionMiddleware(storage: MemoryPersistDriver(), defaultSessionExpiration: .seconds(1800))
     }
 
     // Add health endpoint

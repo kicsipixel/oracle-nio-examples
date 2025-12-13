@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "OAuthKit",
-    platforms: [.macOS(.v14), .iOS(.v17), .tvOS(.v17)],
+    platforms: [.macOS(.v15), .iOS(.v17), .tvOS(.v17)],
     products: [
         .executable(name: "App", targets: ["App"])
     ],
@@ -13,10 +13,13 @@ let package = Package(
         // Hummingbird
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.17.0"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.6.2"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird-auth.git", from: "2.1.0"),
         // Database dependencies
         .package(url: "https://github.com/lovetodream/oracle-nio.git", branch: "main"),
         // Mustache
         .package(url: "https://github.com/hummingbird-project/swift-mustache.git", from: "2.0.2"),
+        // OAuthKit
+        .package(url: "https://github.com/thoven87/oauth-kit.git", from: "1.0.0"),
     ],
     targets: [
         .executableTarget(
@@ -25,10 +28,13 @@ let package = Package(
                 // Hummingbird
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdAuth", package: "hummingbird-auth"),
                 // Database dependencies
                 .product(name: "OracleNIO", package: "oracle-nio"),
                 // Mustache
                 .product(name: "Mustache", package: "swift-mustache"),
+                // OAuthKit
+                .product(name: "OAuthKit", package: "oauth-kit"),
             ],
             path: "Sources/App",
             resources: [.process("Credentials"), .process("Resources")]
