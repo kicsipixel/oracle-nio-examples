@@ -6,6 +6,12 @@
             <b>Latitude:</b> {{ parkContext.latitude }},
             <b>Longitude:</b> {{ parkContext.longitude }}
         </p>
+        <div class="my-4">
+            <a href="/parks/{{ parkContext.id}}/edit"
+               class="inline-block bg-green-100 text-green-600 px-4 py-2 rounded hover:bg-green-200">Edit Park</a>
+            <a href="/parks/{{ parkContext.id}}/delete"
+               class="inline-block bg-red-100 text-red-600 ml-2 px-4 py-2 rounded hover:bg-red-200">Delete Park</a>
+        </div>
     </div>
 {{/body}}
 {{/base}}

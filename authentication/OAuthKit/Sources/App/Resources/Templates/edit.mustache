@@ -1,0 +1,37 @@
+{{<base}}
+{{$body}}
+  <div class="pt-4 px-12">
+    <h1 class="text-2xl font-bold mb-6">{{ title }}</h1>
+    <form method="post" action="/parks/{{parkContext.id}}/edit" class="space-y-6">
+        <!-- Park name -->
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Park name</label>
+            <input type="text" name="name" id="name" placeholder="Kampa" value="{{ parkContext.name }}"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+        </div>
+
+        <!-- Latitude & Longitude side by side -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="latitude" class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                <input type="text" name="latitude" id="latitude" placeholder="50.0959721"
+                    value="{{ parkContext.latitude }}"
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+            </div>
+            <div>
+                <label for="longitude" class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                <input type="text" name="longitude" id="longitude" placeholder="14.4202892"
+                    value="{{ parkContext.longitude }}"
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
+            </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit"
+            class="inline-flex items-center rounded-md bg-green-600 px-4 py-2 text-white font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+            Update
+        </button>
+    </form>
+  </div>
+{{/body}}
+{{/base}}

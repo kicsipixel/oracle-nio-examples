@@ -48,20 +48,16 @@ struct ParksController<Context: RequestContext> {
                    p.coordinates.SDO_POINT.X AS latitude,
                    p.coordinates.SDO_POINT.Y AS longitude,
                    p.details
+                   p.user_id
                 FROM
                   parks p
                 """, logger: logger
             )
 
-            for try await (id, latitude, longitude, details) in stream.decode(
-                (UUID, Float, Float, OracleJSON<Park.Details>).self)
+            for try await (id, latitude, longitude, details, user_id) in stream.decode(
+                (UUID, Double, Double, OracleJSON<Park.Details>, String).self)
             {
-                parks.append(
-                    .init(
-                        id: id,
-                        coordinates: Park.Coordinates.init(
-                            latitude: latitude, longitude: longitude),
-                        details: Park.Details.init(name: details.value.name)))
+                parks.append(.init(id: id, coordinates: Park.Coordinates(latitude: latitude, longitude: longitude), details: Park.Details(name: details.value.name), userId: user_id))
             }
         }
         return parks
@@ -81,20 +77,19 @@ struct ParksController<Context: RequestContext> {
                   id,
                    p.coordinates.SDO_POINT.X AS latitude,
                    p.coordinates.SDO_POINT.Y AS longitude,
-                   p.details
+                   p.details,
+                   p.user_id
                 FROM
                   parks p
                 WHERE id = HEXTORAW(\(guid))
                 """, logger: logger
             )
 
-            for try await (id, latitude, longitude, details) in stream.decode(
-                (UUID, Float, Float, OracleJSON<Park.Details>).self)
+            for try await (id, latitude, longitude, details, user_id) in stream.decode(
+                (UUID, Double, Double, OracleJSON<Park.Details>, String).self)
             {
                 return Park(
-                    id: id,
-                    coordinates: Park.Coordinates.init(latitude: latitude, longitude: longitude),
-                    details: Park.Details.init(name: details.value.name))
+                   id: id, coordinates: Park.Coordinates(latitude: latitude, longitude: longitude), details: Park.Details(name: details.value.name), userId: user_id)
             }
 
             return nil
