@@ -1,5 +1,7 @@
+import Foundation
 import Hummingbird
 import Mustache
+import OracleNIO
 
 struct WebpagesController {
     struct HTML: ResponseGenerator {
@@ -13,6 +15,7 @@ struct WebpagesController {
         }
     }
 
+    let client: OracleClient
     let mustacheLibrary: MustacheLibrary
 
     func addRoutes(to group: RouterGroup<some RequestContext>) {
@@ -22,7 +25,33 @@ struct WebpagesController {
 
     @Sendable
     func indexHandler(request: Request, context: some RequestContext) async throws -> HTML {
-        guard let html = self.mustacheLibrary.render((), withTemplate: "index") else {
+        var parks = [ParkContext]()
+
+        try await client.withConnection { conn in
+            let stream = try await conn.execute(
+                """
+                SELECT
+                   p.id,
+                   p.coordinates.SDO_POINT.X AS latitude,
+                   p.coordinates.SDO_POINT.Y AS longitude,
+                   p.details
+                FROM
+                  parks p
+                """
+            )
+
+            for try await (id, latitude, longitude, details) in stream.decode(
+                (UUID, Double, Double, OracleJSON<Park.Details>).self)
+            {
+                parks.append(
+                    ParkContext(
+                        id: id, name: details.value.name, latitude: latitude, longitude: longitude))
+            }
+        }
+
+        let ctx = ParkIndexContext(parksContext: parks)
+
+        guard let html = self.mustacheLibrary.render(ctx, withTemplate: "index") else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
         }
 
