@@ -14,7 +14,8 @@
             <tbody class="divide-y divide-gray-200">
                 {{#parksContext}}
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-2 text-sm text-green-600">{{ name }}</td>
+                    <td class="px-4 py-2 text-sm text-green-600"><a class="underline decoration-green-600"
+                                              href="/parks/{{ id }}">{{ name }}</a></td>
                     <td class="px-4 py-2 text-sm text-gray-800">{{latitude}}</td>
                     <td class="px-4 py-2 text-sm text-gray-800">{{longitude}}</td>
                 </tr>
