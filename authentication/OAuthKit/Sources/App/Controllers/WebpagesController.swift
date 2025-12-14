@@ -32,7 +32,7 @@ struct WebpagesController {
             .post("/parks/create", use: createPostHandler)
             .get("/parks/:id/edit", use: editHandler)
             .post("/parks/:id/edit", use: editPostHandler)
-        //    .get("/parks/:id/delete", use: deleteHandler)
+            .get("/parks/:id/delete", use: deleteHandler)
     }
 
     // MARK: - index
@@ -193,7 +193,7 @@ struct WebpagesController {
         guard let originalParkId = originalPark.id else {
             throw HTTPError(.internalServerError, message: "Original park ID is missing.")
         }
-        
+
         // Check if the stored entry has the same `user_id` as the the `userId` in the current session
         if originalPark.userId != context.sessions.session?.userId {
             throw HTTPError(.forbidden, message: "You are not allowed to edit this park.")
@@ -215,9 +215,7 @@ struct WebpagesController {
     }
 
     @Sendable
-    func editPostHandler(request: Request, context: AuthRequestContext) async throws
-        -> Response
-    {
+    func editPostHandler(request: Request, context: AuthRequestContext) async throws -> Response {
         let id = try context.parameters.require("id", as: String.self)
         let guid = id.replacingOccurrences(of: "-", with: "")
         let data = try await request.decode(as: ParkFromForm.self, context: context)
@@ -225,14 +223,39 @@ struct WebpagesController {
         let detailsJSON = OracleJSON(Park.Details(name: data.name))
 
         let query: OracleStatement = try """
-                                            UPDATE parks
-                                            SET coordinates = SDO_GEOMETRY(\(data.latitude), \(data.longitude)),
-                                                details     = \(detailsJSON)
-                                            WHERE id = HEXTORAW(\(guid))
+        UPDATE parks
+        SET coordinates = SDO_GEOMETRY(\(data.latitude), \(data.longitude)),
+            details     = \(detailsJSON)
+        WHERE id = HEXTORAW(\(guid))
         """
 
         _ = try await client.withConnection { conn in
             try await conn.execute(query)
+        }
+
+        return Response(
+            status: .seeOther,
+            headers: [.location: "/"]
+        )
+    }
+
+    // MARK: - delete
+    @Sendable func deleteHandler(request: Request, context: AuthRequestContext) async throws -> Response {
+        let id = try context.parameters.require("id", as: String.self)
+        let guid = id.replacingOccurrences(of: "-", with: "")
+
+        _ = try await client.withConnection { conn in
+            let stream = try await conn.execute(
+                """
+                DELETE FROM parks
+                WHERE id = HEXTORAW(\(guid))
+                """
+            )
+
+            let deletedRows = try await stream.affectedRows
+            if deletedRows == 0 {
+                throw HTTPError(.notFound, message: "Park not found.")
+            }
         }
 
         return Response(
@@ -298,11 +321,6 @@ struct WebpagesController {
         guard let email = profile.email, let userId = profile.sub?.value else {
             throw HTTPError(.internalServerError, message: "Cannot get profile details.")
         }
-
-        // User's profile
-        logger.info("Authenticated user's name: \(profile.name ?? "N/A")")
-        logger.info("Authenticated user's ID: \(userId)")
-        logger.info("Authenticated user's email: \(email)")
 
         // Create new session
         let sessionData = AuthSession(
