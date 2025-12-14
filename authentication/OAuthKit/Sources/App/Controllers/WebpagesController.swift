@@ -27,7 +27,8 @@ struct WebpagesController {
             .get("/login", use: loginPageHandler)
             .get("oauth/google", use: loginHandler)
             .get("oauth/google/callback", use: callbackHandler)
-            .add(middleware: RequireAuthMiddleware())
+            .get("/logout", use: logoutHandler)
+            .add(middleware: RequireAuthMiddleware(client: client, oauthService: oauthService))
             .get("/parks/create", use: createHandler)
             .post("/parks/create", use: createPostHandler)
             .get("/parks/:id/edit", use: editHandler)
@@ -38,8 +39,9 @@ struct WebpagesController {
     // MARK: - index
     /// Gets all parks from database
     @Sendable
-    func indexHandler(request: Request, context: some RequestContext) async throws -> HTML {
+    func indexHandler(request: Request, context: AuthRequestContext) async throws -> HTML {
         var parks = [ParkContext]()
+        var ctx: ParkIndexContext
 
         try await client.withConnection { conn in
             let stream = try await conn.execute(
@@ -63,7 +65,11 @@ struct WebpagesController {
             }
         }
 
-        let ctx = ParkIndexContext(parksContext: parks)
+        if let email = context.sessions.session?.email, let userId = context.sessions.session?.userId {
+            ctx = ParkIndexContext(parksContext: parks, userContext: UserContext(userId: userId, email: email, givenName: context.sessions.session?.givenName))
+        } else {
+            ctx = ParkIndexContext(parksContext: parks)
+        }
 
         guard let html = self.mustacheLibrary.render(ctx, withTemplate: "index") else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
@@ -75,7 +81,7 @@ struct WebpagesController {
     // MARK: - show
     /// Shows a park with specified `id`
     @Sendable
-    func showHandler(request: Request, context: some RequestContext) async throws -> HTML {
+    func showHandler(request: Request, context: AuthRequestContext) async throws -> HTML {
         let id = try context.parameters.require("id", as: String.self)
         let guid = id.replacingOccurrences(of: "-", with: "")
         var park: ParkContext? = nil
@@ -107,7 +113,13 @@ struct WebpagesController {
             throw HTTPError(.notFound, message: "Park not found.")
         }
 
-        ctx = ParkShowContext(title: "\(park.name)", parkContext: park)
+        if let email = context.sessions.session?.email, let userId = context.sessions.session?.userId {
+            ctx = ParkShowContext(
+                title: "\(park.name)", parkContext: park, userContext: UserContext(userId: userId, email: email, givenName: context.sessions.session?.givenName)
+            )
+        } else {
+            ctx = ParkShowContext(title: "\(park.name)", parkContext: park)
+        }
 
         guard let html = self.mustacheLibrary.render(ctx, withTemplate: "show") else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
@@ -122,8 +134,15 @@ struct WebpagesController {
         request: Request,
         context: AuthRequestContext
     ) async throws -> HTML {
+        var ctx: ParkCreateContext
 
-        let ctx = ParkCreateContext(title: "New park")
+        if let email = context.sessions.session?.email, let userId = context.sessions.session?.userId {
+            ctx = ParkCreateContext(
+                title: "New park", userContext: UserContext(userId: userId, email: email, givenName: context.sessions.session?.givenName)
+            )
+        } else {
+            ctx = ParkCreateContext(title: "New park")
+        }
 
         guard let html = self.mustacheLibrary.render(ctx, withTemplate: "create") else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
@@ -160,6 +179,7 @@ struct WebpagesController {
         let id = try context.parameters.require("id", as: String.self)
         let guid = id.replacingOccurrences(of: "-", with: "")
         var originalPark: Park? = nil
+        var ctx: ParkEditContext
 
         // Find original park
         _ = try await client.withConnection { conn in
@@ -199,14 +219,20 @@ struct WebpagesController {
             throw HTTPError(.forbidden, message: "You are not allowed to edit this park.")
         }
 
-        let parkContext = ParkContext(
+        let park = ParkContext(
             id: originalParkId,
             name: originalPark.details.name,
             latitude: originalPark.coordinates.latitude,
             longitude: originalPark.coordinates.longitude
         )
 
-        let ctx = ParkEditContext(title: "Edit \(parkContext.name)", parkContext: parkContext)
+        if let email = context.sessions.session?.email, let userId = context.sessions.session?.userId {
+            ctx = ParkEditContext(
+                title: "\(park.name)", parkContext: park, userContext: UserContext(userId: userId, email: email, givenName: context.sessions.session?.givenName)
+            )
+        } else {
+            ctx = ParkEditContext(title: "\(park.name)", parkContext: park)
+        }
 
         guard let html = self.mustacheLibrary.render(ctx, withTemplate: "edit", reload: true) else {
             throw HTTPError(.internalServerError, message: "Failed to render template.")
@@ -225,7 +251,7 @@ struct WebpagesController {
         let query: OracleStatement = try """
         UPDATE parks
         SET coordinates = SDO_GEOMETRY(\(data.latitude), \(data.longitude)),
-            details     = \(detailsJSON)
+        details     = \(detailsJSON)
         WHERE id = HEXTORAW(\(guid))
         """
 
@@ -243,6 +269,29 @@ struct WebpagesController {
     @Sendable func deleteHandler(request: Request, context: AuthRequestContext) async throws -> Response {
         let id = try context.parameters.require("id", as: String.self)
         let guid = id.replacingOccurrences(of: "-", with: "")
+        var toBeDeletedParkUserId = ""
+
+        // Find park to be requested to delete
+        _ = try await client.withConnection { conn in
+            let stream = try await conn.execute(
+                """
+                SELECT
+                   p.user_id
+                FROM
+                  parks p
+                WHERE id = HEXTORAW(\(guid))
+                """
+            )
+
+            for try await (user_id) in stream.decode((String).self) {
+                toBeDeletedParkUserId = user_id
+            }
+        }
+
+        // Check if the owner wants to delete it
+        if toBeDeletedParkUserId != context.sessions.session?.userId {
+            throw HTTPError(.forbidden, message: "You are not allowed to delete this park.")
+        }
 
         _ = try await client.withConnection { conn in
             let stream = try await conn.execute(
@@ -322,15 +371,82 @@ struct WebpagesController {
             throw HTTPError(.internalServerError, message: "Cannot get profile details.")
         }
 
+        // Save token to DB
+        // Before save if the user already exists, update the refresh token
+        try await client.withConnection { conn in
+            let stream = try await conn.execute(
+                """
+                SELECT
+                  refresh_token
+                FROM
+                  tokens
+                WHERE user_id = \(userId)
+                """
+            )
+
+            let queryRows = try await stream.affectedRows
+
+            if queryRows > 0 {
+                let updateQuery: OracleStatement = """
+                    UPDATE tokens
+                    SET refresh_token = \(tokenResponse.refreshToken), 
+                        modified_at = CURRENT_TIMESTAMP
+                    WHERE user_id = \(userId)
+                    """
+                try await conn.execute(updateQuery)
+            } else {
+                let query: OracleStatement =
+                    "INSERT INTO tokens (user_id, email, refresh_token) VALUES (\(userId), \(email), \(tokenResponse.refreshToken))"
+                try await conn.execute(query)
+            }
+        }
+
         // Create new session
         let sessionData = AuthSession(
-            state: String(state), verifier: verifier, userId: userId, email: email,
+            state: String(state), verifier: verifier, userId: userId, email: email, givenName: profile.givenName,
             refreshToken: tokenResponse.refreshToken)
         context.sessions.setSession(sessionData)
 
+        // Issue identity cookie
+        let identityCookie = Cookie(
+            name: "UserId",
+            value: userId,
+            path: "/",
+            secure: true,
+            httpOnly: true,
+            sameSite: .lax
+        )
+
+        var headers: HTTPFields = [.location: "/"]
+        headers[.setCookie] = identityCookie.description
+
         return Response(
             status: .seeOther,
-            headers: [.location: "/"]
+            headers: headers
+        )
+    }
+
+    // MARK: - logout
+    @Sendable
+    func logoutHandler(_: Request, context: AuthRequestContext) async throws -> Response {
+        context.sessions.clearSession()
+
+        let expiredUserIdCookie = Cookie(
+            name: "UserId",
+            value: "",
+            maxAge: 0,
+            path: "/",
+            secure: true,
+            httpOnly: true,
+            sameSite: .lax,
+        )
+
+        var headers: HTTPFields = [.location: "/"]
+        headers[.setCookie] = expiredUserIdCookie.description
+
+        return Response(
+            status: .seeOther,
+            headers: headers
         )
     }
 }

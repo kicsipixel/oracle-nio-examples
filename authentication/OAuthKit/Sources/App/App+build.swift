@@ -31,7 +31,6 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
             ?? .info
         return logger
     }()
-    let router = try buildRouter()
 
     // MARK: - Database configuration
     /// Use `docker  run --name oracle23ai -p 1521:1521 -e ORACLE_PWD=OracleIsAwesome container-registry.oracle.com/database/free:latest-lite`
@@ -80,15 +79,36 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
         print(String(reflecting: error))
     }
 
+    do {
+        try await connection.execute(
+            """
+                CREATE TABLE IF NOT EXISTS tokens (
+                  id RAW (16) DEFAULT SYS_GUID () PRIMARY KEY,
+                  user_id VARCHAR2(64) NOT NULL,
+                  email VARCHAR2(64) NOT NULL,
+                  refresh_token VARCHAR2(512) NOT NULL,
+                  created_at    DATE DEFAULT CURRENT_TIMESTAMP,
+                  modified_at   DATE
+            )
+            """,
+            logger: logger
+        )
+    } catch {
+        print(String(reflecting: error))
+    }
+
     /// Close your connection once done
     try await connection.close()
 
     let client = OracleClient(configuration: config, backgroundLogger: logger)
     let oauthService = try await OAuthService()
-    
+
     // MARK: - Mustache
     let library = try await MustacheLibrary(directory: Bundle.module.bundleURL.path)
     assert(library.getTemplate(named: "base") != nil)
+
+    // MARK: - Router
+    let router = try buildRouter(mustacheLibrary: library)
 
     // MARK: - Controllers
     ParksController(client: client, logger: logger).addRoutes(to: router.group("api/v1/parks"))
@@ -107,14 +127,15 @@ func buildApplication(_ arguments: some AppArguments) async throws -> some Appli
 }
 
 /// Build router
-func buildRouter() throws -> Router<AuthRequestContext> {
+func buildRouter(mustacheLibrary: MustacheLibrary) throws -> Router<AuthRequestContext> {
     let router = Router(context: AuthRequestContext.self)
     // Add middleware
     router.addMiddleware {
         LogRequestsMiddleware(.info)
-        FileMiddleware()
         CORSMiddleware()
-        SessionMiddleware(storage: MemoryPersistDriver(), defaultSessionExpiration: .seconds(1800))
+        SessionMiddleware(storage: MemoryPersistDriver(), defaultSessionExpiration: .seconds(5))
+        ErrorMiddleware(mustacheLibrary: mustacheLibrary)
+        FileMiddleware()
     }
 
     // Add health endpoint
