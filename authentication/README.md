@@ -12,3 +12,9 @@ Source code for the [tutorial](https://medium.com/@kicsipixel/bearer-authenticat
 Source code for the [tutorial](https://medium.com/@kicsipixel/jwt-authentication-using-oraclenio-8870a62b023a)
 
 - JWTAuth [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/JWTAuth)
+
+## OAuthKit example with Hummingbird 2
+
+Source code for the [tutorial]()
+
+- JWTAuth [code]()
