@@ -1,6 +1,4 @@
-{{<base}}
-{{$body}}
-  <div class="pt-4 px-12">
+{{<base}} {{$body}} <div class="pt-4 px-12">
     <h1 class="text-2xl font-bold mb-6">{{ title }}</h1>
     <form method="post" action="/parks/{{parkContext.id}}/edit" class="space-y-6">
         <!-- Park name -->
@@ -32,6 +30,6 @@
             Update
         </button>
     </form>
-  </div>
-{{/body}}
-{{/base}}
+    </div>
+    {{/body}}
+    {{/base}}

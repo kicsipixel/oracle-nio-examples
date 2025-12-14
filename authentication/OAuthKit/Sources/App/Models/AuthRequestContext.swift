@@ -13,7 +13,7 @@ struct AuthRequestContext: SessionRequestContext {
 
     /// session context with String as the session object
     public var sessions: SessionContext<AuthSession>
-    
+
     /// Request decoder that can decode URL-encoded forms
     var requestDecoder: URLFormRequestDecoder { .init() }
 }

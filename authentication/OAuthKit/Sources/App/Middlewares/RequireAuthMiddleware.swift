@@ -23,7 +23,7 @@ struct RequireAuthMiddleware: RouterMiddleware {
             let userId = userCookie.value
             // Look up refresh token in persistent store
             var refreshToken: String? = nil
-            
+
             try await client.withConnection { conn in
                 let stream = try await conn.execute(
                     """
@@ -46,7 +46,7 @@ struct RequireAuthMiddleware: RouterMiddleware {
 
             // Use refresh token to get new access token
             let (tokenResponse, _) = try await oauthService.refreshAccessToken(refreshToken: refreshToken)
-            
+
             // Verify new access token
             let profile = try await oauthService.getUserProfile(accessToken: tokenResponse.accessToken)
 
@@ -63,7 +63,7 @@ struct RequireAuthMiddleware: RouterMiddleware {
                 refreshToken: refreshToken,
             )
             context.sessions.setSession(newSession)
-           
+
             return try await next(request, context)
         }
 
