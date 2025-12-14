@@ -133,7 +133,7 @@ func buildRouter(mustacheLibrary: MustacheLibrary) throws -> Router<AuthRequestC
     router.addMiddleware {
         LogRequestsMiddleware(.info)
         CORSMiddleware()
-        SessionMiddleware(storage: MemoryPersistDriver(), defaultSessionExpiration: .seconds(5))
+        SessionMiddleware(storage: MemoryPersistDriver(), defaultSessionExpiration: .seconds(1800))
         ErrorMiddleware(mustacheLibrary: mustacheLibrary)
         FileMiddleware()
     }
