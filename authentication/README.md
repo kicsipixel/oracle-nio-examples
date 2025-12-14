@@ -17,4 +17,4 @@ Source code for the [tutorial](https://medium.com/@kicsipixel/jwt-authentication
 
 Source code for the [tutorial]()
 
-- JWTAuth [code]()
+- OAuthKit [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/OAuthKit)
