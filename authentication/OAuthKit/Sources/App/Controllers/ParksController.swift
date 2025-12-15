@@ -47,7 +47,7 @@ struct ParksController<Context: RequestContext> {
                   id,
                    p.coordinates.SDO_POINT.X AS latitude,
                    p.coordinates.SDO_POINT.Y AS longitude,
-                   p.details
+                   p.details,
                    p.user_id
                 FROM
                   parks p
@@ -57,12 +57,16 @@ struct ParksController<Context: RequestContext> {
             for try await (id, latitude, longitude, details, user_id) in stream.decode(
                 (UUID, Double, Double, OracleJSON<Park.Details>, String).self)
             {
-                parks.append(.init(id: id, coordinates: Park.Coordinates(latitude: latitude, longitude: longitude), details: Park.Details(name: details.value.name), userId: user_id))
+                parks.append(
+                    .init(
+                        id: id, coordinates: Park.Coordinates(latitude: latitude, longitude: longitude), details: Park.Details(name: details.value.name),
+                        userId: user_id))
             }
         }
+
         return parks
     }
-    
+
     // MARK: - show
     /// Returns a single park with id
     @Sendable
@@ -89,7 +93,8 @@ struct ParksController<Context: RequestContext> {
                 (UUID, Double, Double, OracleJSON<Park.Details>, String).self)
             {
                 return Park(
-                   id: id, coordinates: Park.Coordinates(latitude: latitude, longitude: longitude), details: Park.Details(name: details.value.name), userId: user_id)
+                    id: id, coordinates: Park.Coordinates(latitude: latitude, longitude: longitude), details: Park.Details(name: details.value.name),
+                    userId: user_id)
             }
 
             return nil
