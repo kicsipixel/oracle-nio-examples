@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lime-100: #EBF3EC;
+  --color-lime-200: #D5E7D4;
+  --color-rose-100: #FDECEC;
+  --color-rose-200: #F8D7D7;
+}
