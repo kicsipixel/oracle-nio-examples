@@ -38,3 +38,4 @@ REMOTE_DATABASE_WALLET_PASSWORD=myWall3tPassw0rd
 - [openapi + spatial](https://github.com/kicsipixel/oracle-nio-examples/tree/main/Pharmacies) - Unlocking the new features of Oracle Database 23ai with Swift on Server
 - [authentication](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication) - Bearer, JWT and OAuthKit authentication using OracleNIO
 - [Amazon S3 Compatibility API](https://github.com/kicsipixel/oracle-nio-examples/tree/main/s3-compatibility) - Oracle Cloud Infrastructure's Amazon S3 Compatibility API
+- [elementary-swift](https://github.com/kicsipixel/oracle-nio-examples/tree/main/elementary-swift) - Elementary 
