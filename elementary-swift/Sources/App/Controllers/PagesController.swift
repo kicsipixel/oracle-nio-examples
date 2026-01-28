@@ -52,8 +52,6 @@ struct PagesController<Context: RequestContext> {
   /// Returns with all parks in the database
   @Sendable
   func index(request: Request, context: some RequestContext) async throws -> HTMLResponse {
-    var parks = [Park]()
-
     try await client.withConnection { conn in
       let stream = try await conn.execute(
         """
@@ -67,20 +65,21 @@ struct PagesController<Context: RequestContext> {
         """
       )
 
-      for try await (id, latitude, longitude, details) in stream.decode((UUID, Float, Float, OracleJSON<Park.Details>).self) {
-        parks.append(
-          .init(
+      // Map the decoded stream to Park objects
+      let parksStream = stream
+        .decode((UUID, Float, Float, OracleJSON<Park.Details>).self)
+        .map { (id, latitude, longitude, details) in
+          Park(
             id: id,
-            coordinates: Park.Coordinates.init(latitude: latitude, longitude: longitude),
-            details: Park.Details.init(name: details.value.name)
+            coordinates: Park.Coordinates(latitude: latitude, longitude: longitude),
+            details: Park.Details(name: details.value.name)
           )
-        )
-      }
-    }
+        }
 
-    return HTMLResponse {
-      MainLayout(title: "Parks of Prague") {
-        IndexPage(parks: parks)
+      return HTMLResponse {
+        MainLayout(title: "Parks of Prague") {
+          IndexPage(parks: parksStream)
+        }
       }
     }
   }

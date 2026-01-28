@@ -1,7 +1,8 @@
 import Elementary
 
-struct IndexPage: HTML {
-  let parks: [Park]
+struct IndexPage<Parks: AsyncSequence>: HTML where Parks.Element == Park {
+  let parks: Parks
+
   var body: some HTML {
     div {
       h1(.class("text-3xl")) { "Parks" }
@@ -14,7 +15,7 @@ struct IndexPage: HTML {
           }
         }
         tbody {
-          for park in parks {
+          AsyncForEach(parks) { park in
             tr(.class("hover:bg-gray-50")) {
               td(.class("border border-gray-300 px-4 py-2")) { a(.href("parks/\(park.id)"), .class("text-green-700 underline")) { park.details.name } }
               td(.class("border border-gray-300 px-4 py-2")) { "\(park.coordinates.latitude)" }

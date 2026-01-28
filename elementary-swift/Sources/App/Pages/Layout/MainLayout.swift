@@ -1,6 +1,5 @@
 import Elementary
 
-extension MainLayout: Sendable where Body: Sendable {}
 struct MainLayout<Body: HTML>: HTMLDocument {
   var title: String
   @HTMLBuilder var pageContent: Body
