@@ -1,4 +1,5 @@
 import Configuration
+import CSSSetup
 import Foundation
 import Hummingbird
 import HummingbirdElementary
@@ -26,20 +27,17 @@ func buildApplication(reader: ConfigReader) async throws -> some ApplicationProt
   }()
   let router = try buildRouter()
 
-  // SwiftKaze
-  let kaze = SwiftKaze()
+    // Compile CSS
+    guard let inputURL = Bundle.module.url(forResource: "app", withExtension: "css") else {
+          throw HTTPError(.notFound, message: "File not found.")
+    }
+    let outputURL = URL(fileURLWithPath: "public/styles/app.css")
 
-  guard let inputURL = Bundle.module.url(forResource: "app", withExtension: "css") else {
-    throw HTTPError(.notFound, message: "File not found.")
-  }
-
-  let outputURL = URL(fileURLWithPath: "public/styles/app.css")
-
-  try await kaze.run(
-    input: inputURL,
-    output: outputURL,
-    in: URL(fileURLWithPath: ".")
-  )
+    try await CSSSetup.compileCSS(
+        input: inputURL,
+        output: outputURL,
+        skipIfNotWritable: true
+    )
 
   // Database configuration
   let env = try await Environment.dotEnv()

@@ -41,6 +41,18 @@ RUN cp "/usr/libexec/swift/linux/swift-backtrace-static" ./
 # Copy resources bundled by SPM to staging area
 RUN find -L "$(swift build --package-path /build -c release --show-bin-path)/" -regex '.*\.resources$' -exec cp -Ra {} ./ \;
 
+# ================================
+# BEGIN: Tailwind CSS / SwiftKaze
+# ================================
+# Build and run PrepareCSS tool to compile Tailwind CSS during Docker build.
+# This pre-compiles CSS so public/ can remain read-only at runtime.
+  RUN swift build --package-path /build -c release --product "PrepareCSS" \
+      && cp "$(swift build --package-path /build -c release --show-bin-path)/PrepareCSS" ./ \
+      && cd /build && /staging/PrepareCSS && cd /staging
+# ================================
+# END: Tailwind CSS / SwiftKaze
+# ================================
+
 # Copy any resouces from the public directory and views directory if the directories exist
 # Ensure that by default, neither the directory nor any of its contents are writable.
 RUN [ -d /build/public ] && { mv /build/public ./public && chmod -R a-w ./public; } || true
@@ -58,6 +70,7 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
       libjemalloc2 \
       ca-certificates \
       tzdata \
+      libcurl4 \
 # If your app or its dependencies import FoundationNetworking, also install `libcurl4`.
       # libcurl4 \
 # If your app or its dependencies import FoundationXML, also install `libxml2`.

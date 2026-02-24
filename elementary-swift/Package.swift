@@ -21,6 +21,13 @@ let package = Package(
     .package(url: "https://github.com/kicsipixel/SwiftKaze.git", from: "0.1.0"),
   ],
   targets: [
+    .target(
+               name: "CSSSetup",
+               dependencies: [
+                   .product(name: "SwiftKaze", package: "SwiftKaze")
+               ],
+               path: "Sources/CSSSetup"
+           ),
     .executableTarget(
       name: "App",
       dependencies: [
@@ -37,6 +44,13 @@ let package = Package(
       path: "Sources/App",
       resources: [.process("Resources")]
     ),
+    .executableTarget(
+             name: "PrepareCSS",
+             dependencies: [
+                 "CSSSetup"
+             ],
+             path: "Sources/PrepareCSS"
+         ),
     .testTarget(
       name: "AppTests",
       dependencies: [
