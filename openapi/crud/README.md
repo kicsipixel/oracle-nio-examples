@@ -6,6 +6,7 @@ Special thanks to:
 - Babeth Velghe for her [Stop Worrying About Routes With OpenAPI Generator](https://www.youtube.com/watch?v=n1PRYVveLd0) presentation and
 - [Joannis](https://github.com/Joannis) for his [Using OpenAPI Generator with Hummingbird](https://swiftonserver.com/using-openapi-with-hummingbird/) article.
 
+Tutorial can be read [here](https://medium.com/@kicsipixel/openapi-generator-with-swift-on-server-ca20070cf239)
 
 ## Routes are as follows
 
