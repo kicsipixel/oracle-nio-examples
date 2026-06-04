@@ -1,0 +1,166 @@
+openapi: "3.1.0"
+info:
+  title: AppService
+  version: 1.0.0
+servers:
+  - url: https://example.com/api
+    description: App service deployment.
+paths:
+  # Root ro
+  #
+  /:
+    get:
+      summary: Root route
+      description: Returns a simple message (string)
+      operationId: getHello
+      responses:
+        "200":
+          description: Hello!
+          content:
+            text/plain:
+              schema:
+                type: string
+  # Server health status
+  #
+  /health:
+    get:
+      summary: Server health status
+      description: Responses with 200 OK
+      operationId: getHealth
+      responses:
+        "200":
+          description: Server health status
+  /api/v1/parks:
+    # Creates a new park
+    #
+    post:
+      summary: Create a new park
+      description: Adds a new park to the database
+      operationId: createPark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Park"
+      responses:
+        "201":
+          description: Park created successfully
+        "400":
+          description: Invalid input
+        "500":
+          description: Internal server error
+    # List all parks
+    #
+    get:
+      summary: Get list of parks
+      description: Retrieves a list of all parks
+      operationId: getAllParks
+      responses:
+        "200":
+          description: List of parks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Park"
+        "500":
+          description: Internal server error
+  /api/v1/parks/{id}:
+    # Retrieves a park by its ID
+    #
+    get:
+      summary: Get park by ID
+      description: Retrieves a park by its ID
+      operationId: getParkById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the park to retrieve
+      responses:
+        "200":
+          description: Park found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Park"
+        "404":
+          description: Park not found
+        "500":
+          description: Internal server error
+    # Edits park by id
+    #
+    put:
+      summary: Update park with id
+      description: Updates park with specified id
+      operationId: updateParkById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: JSON array of the park details to be updated
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Park"
+      responses:
+        "200":
+          description: Park was updated successfully
+        "400":
+          description: Bad request/invalid input
+        "404":
+          description: Park has not been found
+        "500":
+          description: Internal server error
+    # Deletes park by id
+    #
+    delete:
+      summary: Delete park by ID
+      description: Deletes a park from the database
+      operationId: deleteParkById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID of the park to delete
+      responses:
+        "204":
+          description: Park deleted successfully
+        "404":
+          description: Park not found
+        "500":
+          description: Internal server error
+components:
+  schemas:
+    Park:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        details:
+          type: object
+          properties:
+            name:
+              type: string
+        coordinates:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: double
+            longitude:
+              type: number
+              format: double
