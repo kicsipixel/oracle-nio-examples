@@ -1,4 +1,4 @@
-# Example to use Swift OpenAPI Generator with OracleNIO
+# Simepl CRUD example to use Swift OpenAPI Generator with OracleNIO
 
 This example demonstrates how to use [Swift OpenAPI Generator](https://github.com/apple/swift-openapi-generator) using [OracleNIO](https://github.com/lovetodream/oracle-nio) with Oracle Database 23ai.
 
