@@ -6,7 +6,7 @@ Example app using [OracleNIO](https://github.com/lovetodream/oracle-nio/tree/mai
 
 - __GET__: /health - Checks server health status
 - __POST__: /api/v1/parks - Creates a new park
-- __GET__: /api/v1/parks- Lists all the parks in the database
+- __GET__: /api/v1/parks - Lists all the parks in the database
 - __GET__: /api/v1/parks/:id - Returns a single park with id
 - __PATCH__: /api/v1/parks/:id - Edits park with id
 - __DELETE__: /api/v1/parks/:id - Deletes park with id
@@ -82,10 +82,12 @@ curl "http://localhost:8080/api/v1/parks"
 
 __Return value:__
 An array of
-- `id`:  park UUID
-- `name` : name of the park
-- `latitude`: langitude value
-- `latitude`: longitude value
+- `id`: park UUID
+- `details`:
+  - `name`: name of the park
+- `coordinates`:
+  - `latitude`: latitude value
+  - `longitude`: longitude value
 
 ```
 [
@@ -113,10 +115,12 @@ curl "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285"
 ```
 
 __Return value:__
-- `id`:  park UUID
-- `name` : name of the park
-- `latitude`: langitude value
-- `latitude`: longitude value
+- `id`: park UUID
+- `details`:
+  - `name`: name of the park
+- `coordinates`:
+  - `latitude`: latitude value
+  - `longitude`: longitude value
 
 ```
    {
@@ -133,7 +137,7 @@ __Return value:__
 ---
 #### Edits park with id
 ---
-To keep the example simple, all values are mandantory. Otherwise, you can create a new model with optional values.
+To keep the example simple, all fields are mandatory. Otherwise, you can create a new model with optional values.
 
 - __URL:__ http://localhost:8080/api/v1/parks/:id
 - __HTTPMethod:__ `PATCH`
@@ -142,9 +146,13 @@ To keep the example simple, all values are mandantory. Otherwise, you can create
 curl -X "PATCH" "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285" \
      -H 'Content-Type: application/json' \
      -d $'{
-  "name": "Žernosecká - Čumpelíkova",
-  "longitude": 14.46098423,
-  "latitude": 50.132259369
+  "details": {
+    "name": "Žernosecká - Čumpelíkova"
+  },
+  "coordinates": {
+    "longitude": 14.46098423,
+    "latitude": 50.132259369
+  }
 }'
 ```
 

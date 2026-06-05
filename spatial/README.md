@@ -1,6 +1,6 @@
 # Location Analysis using Oracle database - API
 
-Example shows one of the Spatial features of Oracle database. It lists resources(parks) based on the distance from your location.
+Example shows one of the Spatial features of Oracle database. It lists resources (parks) based on the distance from your location.
 
 ## Preparation
 Create a `.env` file:
@@ -26,16 +26,18 @@ Simply run the application for the first time only with:
 swift run App --seed
 ```
 
-The database uses [`SDO_GEOMTERY`](https://docs.oracle.com/en/database/oracle/oracle-database/23/spatl/sdo_geometry-object-type.html) object type to to store coordinates. 
+The database uses [`SDO_GEOMETRY`](https://docs.oracle.com/en/database/oracle/oracle-database/23/spatl/sdo_geometry-object-type.html) object type to store coordinates. 
 
 ## Routes are as follows
 
 - __GET__: / - Hello
 - __GET__: /health - Checks server health status
 - __POST__: /api/v1/parks - Creates a new park
-- __GET__: /api/v1/parks- Lists all the parks in the database
-- __GET__: /api/v1/parks/:id - Show a single park with id
-- __POST__: /api/v1/parks/filter - Returns the list of parks which are within the distance
+- __GET__: /api/v1/parks - Lists all the parks in the database
+- __GET__: /api/v1/parks?latlong=lat,lng&distance=d&unit=km - Returns parks within a given distance
+- __GET__: /api/v1/parks/:id - Shows a single park with id
+- __PATCH__: /api/v1/parks/:id - Edits park with id
+- __DELETE__: /api/v1/parks/:id - Deletes park with id
 
 ### 👋 Hello
 Simple endpoint to check whether the server is alive, giving back `200 OK`
@@ -105,12 +107,12 @@ curl "http://localhost:8080/api/v1/parks"
 
 __Return value:__
 An array of
-- `id`:  park UUID
-- `coordinates` 
-    - `latitude`: langitude value
-    - `latitude`: longitude value
+- `id`: park UUID
+- `coordinates`
+    - `latitude`: latitude value
+    - `longitude`: longitude value
 - `details`
-    - `name` : name of the park
+    - `name`: name of the park
     - `address`: street, city, zip, country of the park
 ```shell
 [
@@ -149,29 +151,31 @@ curl "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285"
 ```
 
 __Return value:__
-- `id`:  park UUID
-- `coordinates` 
-    - `latitude`: langitude value
-    - `latitude`: longitude value
+- `id`: park UUID
+- `coordinates`
+    - `latitude`: latitude value
+    - `longitude`: longitude value
 - `details`
-    - `name` : name of the park
+    - `name`: name of the park
     - `address`: street, city, zip, country of the park
 
 ```shell
 {
   "id": "59DAAB3F-862B-4C02-9CA6-B003B298F35A",
-  "address": "Koňská stezka, 17000 Praha, Česko",
   "coordinates": {
     "latitude": 50.105849,
     "longitude": 14.413999
   },
-  "name": "Stromovka"
+  "details": {
+    "address": "Koňská stezka, 17000 Praha, Česko",
+    "name": "Stromovka"
+  }
 }
 ```
 ---
-#### Returns the list of  parks within the given distance
+#### Returns the list of parks within the given distance
 ---
-- __URL:__ http://localhost:8080/api/v1/parks?latlong=50.08,14.41&distance=1&unit=km"
+- __URL:__ http://localhost:8080/api/v1/parks?latlong=50.08,14.41&distance=1&unit=km
 - __HTTPMethod:__ `GET`
 
 ```
@@ -180,12 +184,12 @@ curl "http://localhost:8080/api/v1/parks?latlong=50.08,14.41&distance=1&unit=km"
 
 __Return value:__
 An array of
-- `id`:  park UUID
-- `coordinates` 
-    - `latitude`: langitude value
-    - `latitude`: longitude value
+- `id`: park UUID
+- `coordinates`
+    - `latitude`: latitude value
+    - `longitude`: longitude value
 - `details`
-    - `name` : name of the park
+    - `name`: name of the park
     - `address`: street, city, zip, country of the park
 ```shell
 [
@@ -213,3 +217,42 @@ An array of
   }
 ]
 ```
+---
+#### Edits park with id
+---
+To keep the example simple, all fields are mandatory. Otherwise, you can create a new model with optional values.
+
+- __URL:__ http://localhost:8080/api/v1/parks/:id
+- __HTTPMethod:__ `PATCH`
+
+```shell
+curl -X "PATCH" "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285" \
+     -H 'Content-Type: application/json' \
+     -d $'{
+  "details": {
+    "address": "Koňská stezka, 17000 Praha, Česko",
+    "name": "Stromovka"
+  },
+  "coordinates": {
+    "longitude": 14.413999,
+    "latitude": 50.105846
+  }
+}'
+```
+
+__Return value:__
+- `200 OK`
+
+---
+#### Deletes park with id
+---
+
+- __URL:__ http://localhost:8080/api/v1/parks/:id
+- __HTTPMethod:__ `DELETE`
+
+```shell
+curl -X "DELETE" "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285"
+```
+
+__Return value:__
+- `204 No Content`

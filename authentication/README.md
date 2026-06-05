@@ -15,6 +15,6 @@ Source code for the [tutorial](https://medium.com/@kicsipixel/jwt-authentication
 
 ## OAuthKit example with Hummingbird 2
 
-Source code for the [tutorial]()
+Source code for the tutorial (coming soon)
 
 - OAuthKit [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/OAuthKit)

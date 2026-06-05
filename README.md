@@ -5,7 +5,7 @@ Examples to demonstrate [Hummingbird 2.0](https://hummingbird.codes) with [Oracl
 ## Preparation
 ### Step 1. Local Database
 
-Create an `.env.` file with the credentials:
+Create an `.env` file with the credentials:
 ```
 DATABASE_HOST=127.0.0.1
 DATABASE_SERVICE_NAME=freepdb1
@@ -18,7 +18,7 @@ If you are not sure how to create a new user, password and tablespace, you can f
 Download wallet for mTLS connection, and copy the Connection string from OCI console.
 ![](ADB.png)
 ![](ADB2.png)
-Create an `.env.` file with the credentials:
+Create an `.env` file with the credentials:
 ```
 REMOTE_DATABASE_HOST=adb.eu-frankfurt-1.oraclecloud.com
 REMOTE_DATABASE_PORT=1522

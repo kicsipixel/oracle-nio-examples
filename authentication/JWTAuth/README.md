@@ -1,17 +1,17 @@
 # Basic CRUD operations and JWT Authentication using Oracle database
 
-Example of app using [OracleNIO](https://github.com/lovetodream/oracle-nio/tree/main) to connect to Oracle database. It creates a table, then user can add read entires without credentials but for creating new, update and delete user must send her/his token as authentication.
+Example of app using [OracleNIO](https://github.com/lovetodream/oracle-nio/tree/main) to connect to Oracle database. It creates a table, then users can read entries without credentials but for creating new, update and delete the user must send their token as authentication.
 
 ## Routes are as follows
 
 - __GET__: /health - Checks server health status
 - __POST__: /api/v1/parks - Creates a new park
-- __GET__: /api/v1/parks- Lists all the parks in the database
+- __GET__: /api/v1/parks - Lists all the parks in the database
 - __GET__: /api/v1/parks/:id - Returns a single park with id
 - __PATCH__: /api/v1/parks/:id - Edits park with id
 - __DELETE__: /api/v1/parks/:id - Deletes park with id
-- __POST__: /api/v1/users: - Register user
-- __POST__: /api/v1/users/login: - Login user
+- __POST__: /api/v1/users - Register user
+- __POST__: /api/v1/users/login - Login user
 
 
 ### 🩺 Health
@@ -87,11 +87,13 @@ $ curl "http://localhost:8080/api/v1/parks"
 
 __Return value:__
 An array of
-- `id`:  park UUID
-- `details` : details of the park
-- `latitude`: langitude value
-- `latitude`: longitude value
-- `userId` : id of the owner
+- `id`: park UUID
+- `userId`: user UUID
+- `details`:
+  - `name`: name of the park
+- `coordinates`:
+  - `latitude`: latitude value
+  - `longitude`: longitude value
 
 ```
 [
@@ -120,11 +122,13 @@ $ curl "http://localhost:8080/api/v1/parks/2179C563-F93E-2F37-E063-020011AC0285"
 ```
 
 __Return value:__
-- `id`:  park UUID
-- `details` : details of the park
-- `latitude`: langitude value
-- `latitude`: longitude value
-- `userId` : id of the owner
+- `id`: park UUID
+- `userId`: user UUID
+- `details`:
+  - `name`: name of the park
+- `coordinates`:
+  - `latitude`: latitude value
+  - `longitude`: longitude value
 
 ```
 [
@@ -144,7 +148,7 @@ __Return value:__
 ---
 #### Edits park with id
 ---
-To keep the example simple, all values are mandantory. Otherwise, you can create a new model with optional values.
+Fields are optional — omit any you don't want to change.
 
 - __URL:__ http://localhost:8080/api/v1/parks/:id
 - __HTTPMethod:__ `PATCH`
@@ -215,7 +219,7 @@ $ curl -X "POST" "http://localhost:8080/api/v1/users/login" \
 ```
 
 __Return value:__
-- `token`: JW token
+- `token`: JWT token
 
 ```
 {

@@ -2,7 +2,7 @@
 
 This example demonstrates how to natively write, read, and query JSON data using Oracle Database 23ai.
 
-The sample data (included in the repo) :
+The sample data (included in the repo):
 ```json
 {
   "results": [
@@ -45,16 +45,16 @@ Data stored in database:
 
 ## Routes are as follows
 
-- __GET__: / - Return with simple "Hello!"
+- __GET__: / - Returns a simple "Hello!"
 - __GET__: /health - Checks server health status
 - __GET__: /api/v1/people - Lists all the people in the database
 - __GET__: /api/v1/people/:id - Shows a single person with id
-- __POST__: /api/v1/people/- Creates new person in the database
+- __POST__: /api/v1/people - Creates a new person in the database
 - __PUT__: /api/v1/people/:id - Edits the person in the database with given id
-- __POST__: /api/v1/people/:id - Deletes the person from database with given id
+- __DELETE__: /api/v1/people/:id - Deletes the person from the database with given id
 
 ### 👋 Hello
-Simple endpoint returns with "Hello!".
+Simple endpoint returns "Hello!".
 
 - __URL:__ http://localhost:8080
 - __HTTPMethod:__ `GET`
@@ -184,7 +184,7 @@ __Return value:__
 
 #### Returns the list of people which comply to the filter
 
-- __URL:__ http://localhost:8080/api/v1/people/filter
+- __URL:__ http://localhost:8080/api/v1/people
 - __HTTPMethod:__ `GET`
 
 ```
@@ -199,7 +199,7 @@ FROM
     people
 WHERE
     JSON_EXISTS ( people_list, '$.hobbies[*]?(@ == "reading")' )
-    AND JSON_VALUE(people_list, '$.nat') = 'NL';
+    AND JSON_VALUE(people_list, '$.nationality') = 'DE';
 ```
 
 __Return value:__
@@ -276,9 +276,9 @@ An array of
 ]
 ```
 
-#### Creates a single person with id
+#### Creates a single person
 
-- __URL:__ http://localhost:8080/api/v1/people/
+- __URL:__ http://localhost:8080/api/v1/people
 - __HTTPMethod:__ `POST`
 
 ```
@@ -347,4 +347,4 @@ $ curl -X "DELETE" "http://localhost:8080/api/v1/people/BFDA1A91-1681-4703-8DC3-
 
 __Return value:__
 
-`204 No content`
+`204 No Content`

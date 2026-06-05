@@ -1,6 +1,6 @@
 # Location Analysis using Oracle database - Web app
 
-Example shows one of the Spatial features of Oracle database. It lists resources(parks) based on the distance from your location.
+Example shows one of the Spatial features of Oracle database. It lists resources (parks) based on the distance from your location.
 
 You can try it [here](https://spatial-web.fly.dev/).
 
@@ -14,11 +14,13 @@ Simply run the application for the first time only with:
 ```shell
 swift run App --seed
 ```
-The database uses [`SDO_GEOMTERY`](https://docs.oracle.com/en/database/oracle/oracle-database/23/spatl/sdo_geometry-object-type.html) object type to to store coordinates. 
+The database uses [`SDO_GEOMETRY`](https://docs.oracle.com/en/database/oracle/oracle-database/23/spatl/sdo_geometry-object-type.html) object type to store coordinates. 
 
-## Route is the following
+## Routes are as follows
 
 - __GET__: /health - Checks server health status
+- __GET__: / - Renders the map with all parks listed
+- __POST__: / - Filters parks by distance from a selected location and re-renders the map
 
 
 ### 🩺 Health
@@ -39,3 +41,4 @@ Server: spatial-web
 
 - __URL:__ http://localhost:8080/
 
+The index page renders an interactive map (powered by [MapKit JS](https://developer.apple.com/maps/web/)) showing all parks. Submitting the form with a location and distance filters the list using Oracle's `SDO_WITHIN_DISTANCE` spatial query and re-renders the map.

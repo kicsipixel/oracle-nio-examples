@@ -1,8 +1,10 @@
 # Basic CRUD operations and OAuthKit using Oracle database
 
-The example demonstrate "Sign in with Google" using [OAuthKit](https://github.com/thoven87/oauth-kit/tree/main). The app  connects to Oracle database. It creates a table, then user can add read entires without credentials but for creating new, update and delete a balid session must exists.
+This example demonstrates "Sign in with Google" using [OAuthKit](https://github.com/thoven87/oauth-kit/tree/main). The app connects to Oracle database. It creates a table, then users can read entries without credentials but for creating new, update and delete a valid session must exist.
 
 ## Routes
+
+### Web routes
 
 - **GET** `/` – Index page  
 - **GET** `/parks/:id` – Show details of a single park  
@@ -15,6 +17,15 @@ The example demonstrate "Sign in with Google" using [OAuthKit](https://github.co
 - **GET** `/parks/:id/edit` – Show form to edit an existing park  
 - **POST** `/parks/:id/edit` – Submit form to edit an existing park  
 - **GET** `/parks/:id/delete` – Delete a park by ID  
+
+### API routes
+
+- **GET** `/health` – Checks server health status
+- **POST** `/api/v1/parks` – Creates a new park
+- **GET** `/api/v1/parks` – Lists all the parks in the database
+- **GET** `/api/v1/parks/:id` – Returns a single park with id
+- **PATCH** `/api/v1/parks/:id` – Edits park with id
+- **DELETE** `/api/v1/parks/:id` – Deletes park with id
 
 ---
 
@@ -76,7 +87,7 @@ Submits a form to create a new park.
 ### Edit Park
 Shows a form to edit an existing park.
 
-- **URL:**`http://localhost:8080/parks/:id/edit`
+- **URL:** `http://localhost:8080/parks/:id/edit`
 - **HTTP Method:** `GET`
 
 
@@ -92,4 +103,3 @@ Deletes a park by ID.
 
 - **URL:** `http://localhost:8080/parks/:id/delete`
 - **HTTP Method:** `GET`
-
