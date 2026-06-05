@@ -2,7 +2,8 @@
 
 Example shows one of the Spatial features of Oracle database. It lists resources (parks) based on the distance from your location.
 
-You can try it [here](https://spatial-web.fly.dev/).
+__Note:__
+Apple has updated the requirements for using MapKit JS, which may affect map rendering.
 
 <div style="display: flex; justify-content: space-between;">
   <img src="spatial-web-1.png" alt="Spatial Web 1" style="width: 48%;">

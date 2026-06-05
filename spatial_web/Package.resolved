@@ -1,5 +1,5 @@
 {
-  "originHash" : "6179b21be433875b58e624344fff246938daa1efe1d903b30dc52659c37d3660",
+  "originHash" : "1f35e555a2aba1f32277da8d52d0847c46167b3ab493e6ab9e770a210f7020a1",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -25,7 +25,7 @@
       "location" : "https://github.com/lovetodream/oracle-nio.git",
       "state" : {
         "branch" : "main",
-        "revision" : "a38c0839f3a1aad8fb99b45aa8cace0cd5a820bf"
+        "revision" : "01a207aa0ec99cf9515ec77154ade671afb504c8"
       }
     },
     {
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-distributed-tracing.git",
       "state" : {
-        "revision" : "a64a0abc2530f767af15dd88dda7f64d5f1ff9de",
-        "version" : "1.2.0"
+        "revision" : "dc4030184203ffafbb2ec614352487235d747fe0",
+        "version" : "1.4.1"
       }
     },
     {
@@ -222,8 +222,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "0687f71944021d616d34d922343dcef086855920",
-        "version" : "600.0.1"
+        "revision" : "2b59c0c741e9184ab057fd22950b491076d42e91",
+        "version" : "603.0.0"
       }
     },
     {

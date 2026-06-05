@@ -2,7 +2,7 @@ function initializeMap(annotationData, defaultLocation) {
     // Replace 'YOUR_JWT_TOKEN' with your actual JWT token, because it expires after 7 days
     mapkit.init({
         authorizationCallback: function (done) {
-            done('eyJraWQiOiJYSlYzVzZTNEczIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiIzNThXSFFGOTRXIiwiaWF0IjoxNzQzNDExMjE2LCJleHAiOjE3NDQwOTU1OTl9.G9QmlDdZDCybta9xiHLAPhe0xzZgUyXJekeC6HgOAEbGoiJUrDfzp4YekjMmEIjpO4aMV0eyeYZc1GemKJ88VA');
+            done('eyJraWQiOiI5TlRUOURXUllNIiwidHlwIjoiSldUIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiJWNDY4MjRQUjhGIiwiaWF0IjoxNzgwNjQ1MDU0LCJleHAiOjE3OTYxOTcwNTR9.c478hW9I7VF8iyDN_tKz1lKpJNbidWMzaIV3QYmdfIB5CvsilbvE5hcbn3Kvpr6LqmYBMvHIA6FCEQSCxmXhKA');
         }
     });
 
