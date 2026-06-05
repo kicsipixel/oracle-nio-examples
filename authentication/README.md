@@ -15,6 +15,7 @@ Source code for the [tutorial](https://medium.com/@kicsipixel/jwt-authentication
 
 ## OAuthKit example with Hummingbird 2
 
-Source code for the tutorial (coming soon)
+Source code for the [tutorial](https://medium.com/@kicsipixel/oauthkit-drop-in-authentication-for-swift-backends-1ce38ceaa775)
+
 
 - OAuthKit [code](https://github.com/kicsipixel/oracle-nio-examples/tree/main/authentication/OAuthKit)
